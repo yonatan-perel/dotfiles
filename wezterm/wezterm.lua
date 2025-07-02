@@ -4,15 +4,37 @@ local wezterm = require("wezterm")
 -- This will hold the configuration.
 local config = wezterm.config_builder()
 
--- This is where you actually apply your config choices
-
--- For example, changing the color scheme:
-config.color_scheme_dirs = { "./schemas" }
 config.enable_tab_bar = false
-config.font_size = 25
-config.color_scheme = "nord"
+config.font = wezterm.font("Iosevka")
+config.font_size = 20
+--config.colors = wezterm.color.load_scheme("/Users/yonatan.perel/.config/wezterm/schemes/alabaster.toml")
+--local dimmer = { brightness = 0.012 }
+--config.background = {
+--	{
+--		source = { File = "/Users/yonatan.perel/Downloads/IMG_3962-EDIT.jpg" },
+--		hsb = dimmer,
+--		vertical_align = "Middle",
+--		vertical_offset = "2cell",
+--	},
+--}
+--local dimmer = { brightness = 0.1 }
+--config.background = {
+--	{
+--		source = { File = "/Users/yonatan.perel/Downloads/IMG_3721.png" },
+--		hsb = dimmer,
+--	},
+--}
+--local dimmer = { brightness = 0.12 }
+--config.background = {
+--	{
+--		source = { File = "/Users/yonatan.perel/Downloads/IMG_3765 (1).png" },
+--		hsb = dimmer,
+--	},
+--}
+config.color_scheme = "Everforest Dark Hard (Gogh)"
 config.colors = {
-	background = "#000000",
+	background = "#16161D",
+	--background = "#111111",
 }
 
 local mux = wezterm.mux

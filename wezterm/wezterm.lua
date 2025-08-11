@@ -6,7 +6,7 @@ local config = wezterm.config_builder()
 
 config.enable_tab_bar = false
 config.font = wezterm.font("Iosevka")
-config.font_size = 20
+config.font_size = 16
 --config.colors = wezterm.color.load_scheme("/Users/yonatan.perel/.config/wezterm/schemes/alabaster.toml")
 --local dimmer = { brightness = 0.012 }
 --config.background = {

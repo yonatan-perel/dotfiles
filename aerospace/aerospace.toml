@@ -209,4 +209,4 @@ run = 'move-node-to-workspace P'
 
 [[on-window-detected]]
 if.app-id = 'org.pgadmin.pgadmin4'
-run = 'move-node-to-workspace q'
+run = 'move-node-to-workspace Q'

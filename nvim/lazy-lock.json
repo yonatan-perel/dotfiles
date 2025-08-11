@@ -1,0 +1,9 @@
+{
+  "everforest": { "branch": "master", "commit": "4132e797f6ce555de53825b6ef3df0b618456703" },
+  "fzf-lua": { "branch": "main", "commit": "df916902bcefde1119c05a57376d679a388db5fc" },
+  "lazy.nvim": { "branch": "main", "commit": "6c3bda4aca61a13a9c63f1c1d1b16b9d3be90d7a" },
+  "mason.nvim": { "branch": "main", "commit": "7dc4facca9702f95353d5a1f87daf23d78e31c2a" },
+  "nvim-treesitter": { "branch": "main", "commit": "9866036ec3c5db40700a9178494e0cfdcfe6ecfd" },
+  "nvim-web-devicons": { "branch": "master", "commit": "c2599a81ecabaae07c49ff9b45dcd032a8d90f1a" },
+  "oil.nvim": { "branch": "master", "commit": "bbad9a76b2617ce1221d49619e4e4b659b3c61fc" }
+}

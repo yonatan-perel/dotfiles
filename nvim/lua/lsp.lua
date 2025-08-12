@@ -1,11 +1,4 @@
-local lsp_dir = vim.fn.stdpath("config") .. "/lsp"
-local lsp_servers = {}
-
-for _, file in ipairs(vim.fn.readdir(lsp_dir)) do
-  if file:match("%.lua$") and file ~= "init.lua" then
-    local server_name = file:gsub("%.lua$", "")
-    table.insert(lsp_servers, server_name)
-  end
-end
-
-vim.lsp.enable(lsp_servers)
+_G.lsps = { "gopls", "lua_ls", "pyright", "ts_ls", "bashls" }
+_G.languages = { "go", "lua", "python", "sql", "bash" }
+_G.filetypes = { "go", "gomod", "gowork", "gotmpl", "lua", "sh", "bash", "sql", "py" }
+vim.lsp.enable(_G.lsps)

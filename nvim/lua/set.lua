@@ -10,6 +10,8 @@ vim.keymap.set("n", "<leader>i", vim.lsp.buf.format)
 
 vim.keymap.set("n", "H", "^")
 vim.keymap.set("n", "L", "$")
+vim.keymap.set("v", "H", "^")
+vim.keymap.set("v", "L", "$")
 
 vim.keymap.set("n", "K", vim.lsp.buf.hover)
 vim.keymap.set("n", "<leader>k", vim.diagnostic.open_float)
@@ -24,4 +26,8 @@ vim.keymap.set({"n", "v"}, "<C-y>", [["+y]])
 vim.keymap.set({"n", "v"}, "<C-p>", [["+p]])
 
 vim.keymap.set("n", "'", "%")
+
+vim.keymap.set('n', '<C-w>\\', '<cmd>vsplit<cr>', { desc = 'Vertical split' })
+vim.keymap.set('n', '<C-w>-', '<cmd>split<cr>', { desc = 'Horizontal split' })
+vim.keymap.set('n', '<C-w>c', '<cmd>close<cr>', { desc = 'Close current pane' })
 

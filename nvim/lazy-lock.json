@@ -1,4 +1,5 @@
 {
+  "blame.nvim": { "branch": "main", "commit": "b87b8c820e4cec06fbbd2f946b7b35c45906ee0c" },
   "dashboard-nvim": { "branch": "master", "commit": "c42fcfbd96dfcaa486c0a0ab52494316f1c31350" },
   "everforest": { "branch": "master", "commit": "4132e797f6ce555de53825b6ef3df0b618456703" },
   "fzf-lua": { "branch": "main", "commit": "5a0581cf0d8a9336404f99a53f28472d3a8efe1a" },

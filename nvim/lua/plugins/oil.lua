@@ -8,6 +8,8 @@ return {
             },
             keymaps = {
                 ["q"] = "actions.close",
+                ["<C-h>"] = false,
+                ["<C-l>"] = false,
             },
         })
     end,

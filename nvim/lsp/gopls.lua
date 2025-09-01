@@ -2,6 +2,7 @@ return {
   cmd = { 'gopls' },
   filetypes = { 'go', 'gomod', 'gowork', 'gotmpl' },
   root_markers = { 'go.work', 'go.mod', '.git' },
+  capabilities = require('lsp-utils').get_capabilities(),
   settings = {
     gopls = {
       analyses = {

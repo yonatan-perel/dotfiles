@@ -1,0 +1,6 @@
+.aider*
+
+# Tmux plugins managed by tpm
+tmux/plugins/tpm
+tmux/plugins/tmux-resurrect
+tmux/plugins/tmux-now-playing

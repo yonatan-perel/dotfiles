@@ -60,4 +60,4 @@ eval "$(mise activate zsh)"
 # Mise activation end
 
 # Tmux auto session cd
-source ~/.config/tmux/plugins/tmux-auto-session-cd/scripts/auto-session-cd.sh
+source ~/.tmux/plugins/tmux-auto-session-cd/scripts/auto-session-cd.sh

@@ -26,6 +26,7 @@ vim.keymap.set({"n", "v"}, "<C-y>", [["+y]])
 vim.keymap.set({"n", "v"}, "<C-p>", [["+p]])
 
 vim.keymap.set("n", "'", "%")
+vim.keymap.set("v", "'", "%")
 
 vim.keymap.set('n', '<C-w>\\', '<cmd>vsplit<cr>', { desc = 'Vertical split' })
 vim.keymap.set('n', '<C-w>-', '<cmd>split<cr>', { desc = 'Horizontal split' })

@@ -1,12 +1,39 @@
 return {
-    'sainnhe/everforest',
-    lazy = false,
-    priority = 1000,
-    config = function()
-        -- Optionally configure and load the colorscheme
-        -- directly inside the plugin declaration.
-        vim.g.everforest_enable_italic = true
-        vim.g.everforest_transparent_background = true
-        vim.cmd.colorscheme('everforest')
-    end
+    --{
+    --    'sainnhe/everforest',
+    --    lazy = false,
+    --    priority = 1000,
+    --    config = function()
+    --        vim.g.everforest_transparent_background = 2
+    --        vim.cmd.colorscheme('everforest')
+    --    end
+    --},
+    --{
+    --    "zenbones-theme/zenbones.nvim",
+    --    dependencies = "rktjmp/lush.nvim",
+    --    lazy = false,
+    --    priority = 1000,
+    --    config = function()
+    --        vim.g.seoulbones_transparent_background = true
+    --        vim.g.seoulbones_lighten_comments = 1000
+    --        vim.g.seoulbones_darken_comments = 0
+    --        vim.cmd.colorscheme('seoulbones')
+    --    end
+    --}
+    --{
+    --    'rebelot/kanagawa.nvim',
+    --    lazy = false,
+    --    priority = 1000,
+    --    config = function()
+    --        vim.cmd("colorscheme kanagawa-wave")
+    --    end
+    --}
+    --{
+    --    "mcauley-penney/techbase.nvim",
+    --    lazy = false,
+    --    config = function(_, opts)
+    --        vim.cmd.colorscheme("techbase")
+    --    end,
+    --    priority = 1000
+    --}
 }

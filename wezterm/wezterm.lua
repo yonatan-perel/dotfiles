@@ -5,7 +5,7 @@ local wezterm = require("wezterm")
 local config = wezterm.config_builder()
 
 config.enable_tab_bar = false
-config.font = wezterm.font("Iosevka")
+config.font = wezterm.font("Inconsolata")
 config.font_size = 14
 
 config.color_scheme = 'Lake Dweller' --"Everforest Dark Hard (Gogh)"
@@ -17,6 +17,7 @@ wezterm.on("gui-startup", function(cmd)
     window:gui_window():maximize()
 end)
 
+config.front_end = "OpenGL"
 config.freetype_load_target = "Light"
 config.freetype_load_flags = "NO_HINTING"
 config.window_decorations = "RESIZE"

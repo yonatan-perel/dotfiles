@@ -4,3 +4,6 @@
 tmux/plugins/tpm
 tmux/plugins/tmux-resurrect
 tmux/plugins/tmux-now-playing
+
+# Lazygit state file
+lazygit/state.yml

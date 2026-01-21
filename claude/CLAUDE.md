@@ -1,0 +1,3 @@
+- Don't comment or document code unless instracted to. if you think something some comment is importent, ask me before adding it!
+- When asked to build the repo/service use `go build`. when asked to test use `go test`.
+- When running `go build` commands, always build into the tmp directory in the same repo.

@@ -1,4 +1,4 @@
-- Don't comment or document code unless instracted to. if you think something some comment is importent, ask me before adding it!
-- When asked to build the repo/service use `go build`. when asked to test use `go test`.
+- Don't comment or document code unless instructed to. If you think a comment is important, ask me before adding it.
+- When asked to build a repo/service, use `go build`. When asked to test, use `go test`.
 - When running `go build` commands, always build into the tmp directory in the same repo.
 - Some repos have a `.memory` directory. Use it to store anything useful between sessions or when context is cleared (plans, notes, context). When asked to implement a plan, check `.memory` first.

@@ -7,3 +7,7 @@ tmux/plugins/tmux-now-playing
 
 # Lazygit state file
 lazygit/state.yml
+
+# Third-party zsh plugins (installed via zsh/install.sh)
+zsh/plugins/
+

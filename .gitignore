@@ -11,3 +11,6 @@ lazygit/state.yml
 # Third-party zsh plugins (installed via zsh/install.sh)
 zsh/plugins/
 
+# Work-specific aliases
+zsh/work.zsh
+

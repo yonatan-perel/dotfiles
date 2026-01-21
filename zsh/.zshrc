@@ -2,6 +2,7 @@ export XDG_CONFIG_HOME="$HOME/.config"
 
 # Aliases and functions
 source ~/.config/zsh/aliases.zsh
+[ -f ~/.config/zsh/work.zsh ] && source ~/.config/zsh/work.zsh
 
 # Third-party plugins
 source ~/.config/zsh/plugins/fzf-tab/fzf-tab.plugin.zsh

@@ -26,6 +26,8 @@ function git_branch_checkout {
 alias gfc="git_fuzzy_checkout"
 alias gfm="git_fuzzy_merge"
 alias gbc="git_branch_checkout"
+alias gl="lazygit"
+alias gcon="git commit --no-verify"
 
 # AWS
 alias asl="aws sso login"

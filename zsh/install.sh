@@ -20,4 +20,8 @@ if [ ! -d "$PLUGIN_DIR/zsh-autosuggestions" ]; then
   git clone https://github.com/zsh-users/zsh-autosuggestions "$PLUGIN_DIR/zsh-autosuggestions"
 fi
 
+if [ ! -d "$PLUGIN_DIR/zsh-system-clipboard" ]; then
+  git clone https://github.com/kutsan/zsh-system-clipboard "$PLUGIN_DIR/zsh-system-clipboard"
+fi
+
 echo "Done!"

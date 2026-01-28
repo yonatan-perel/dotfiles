@@ -6,7 +6,9 @@ source ~/.config/zsh/aliases.zsh
 
 # Third-party plugins
 source ~/.config/zsh/plugins/fzf-tab/fzf-tab.plugin.zsh
+source <(fzf --zsh)
 source ~/.config/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
+source ~/.config/zsh/plugins/zsh-system-clipboard/zsh-system-clipboard.zsh
 
 # Pure prompt
 fpath+=("$(brew --prefix)/share/zsh/site-functions")

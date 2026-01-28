@@ -28,6 +28,8 @@ alias gfm="git_fuzzy_merge"
 alias gbc="git_branch_checkout"
 alias gl="lazygit"
 alias gcon="git commit --no-verify"
+alias prv="gh pr view --web"
+alias gmm="git pull origin master"
 
 # AWS
 alias asl="aws sso login"

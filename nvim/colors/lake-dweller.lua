@@ -362,6 +362,52 @@ hi("FzfLuaPreviewSearch", { fg = C.light_grey, bg = C.dusk_blue })
 hi("FzfLuaPreviewMatch", { fg = C.muted_slate, bg = C.dark_navy, underline = true })
 
 ---------------------------------------------------------------------
+-- which-key.nvim
+---------------------------------------------------------------------
+hi("WhichKey", { fg = C.pale_blue, bg = C.dark_navy })
+hi("WhichKeyGroup", { fg = C.muted_cyan, bg = C.dark_navy, bold = true })
+hi("WhichKeyDesc", { fg = C.light_grey, bg = C.dark_navy })
+hi("WhichKeySeperator", { fg = C.steel_grey, bg = C.dark_navy })
+hi("WhichKeySeparator", { fg = C.steel_grey, bg = C.dark_navy })
+hi("WhichKeyFloat", { fg = C.light_grey, bg = C.dark_navy })
+hi("WhichKeyBorder", { fg = C.ash_grey, bg = C.dark_navy })
+hi("WhichKeyValue", { fg = C.muted_slate, bg = C.dark_navy })
+hi("WhichKeyNormal", { fg = C.light_grey, bg = C.dark_navy })
+hi("WhichKeyTitle", { fg = C.light_grey, bg = C.dark_navy, bold = true })
+
+---------------------------------------------------------------------
+-- Snacks.nvim (picker, etc.)
+---------------------------------------------------------------------
+hi("SnacksPickerNormal", { fg = C.light_grey, bg = C.dark_navy })
+hi("SnacksPickerBorder", { fg = C.ash_grey, bg = C.dark_navy })
+hi("SnacksPickerTitle", { fg = C.light_grey, bg = C.dark_navy, bold = true })
+
+hi("SnacksPickerPrompt", { fg = C.muted_slate, bg = C.dark_navy })
+hi("SnacksPickerInput", { fg = C.light_grey, bg = C.dark_navy })
+hi("SnacksPickerInputBorder", { fg = C.ash_grey, bg = C.dark_navy })
+hi("SnacksPickerInputTitle", { fg = C.light_grey, bg = C.dark_navy, bold = true })
+
+hi("SnacksPickerList", { fg = C.light_grey, bg = C.dark_navy })
+hi("SnacksPickerListBorder", { fg = C.ash_grey, bg = C.dark_navy })
+hi("SnacksPickerListTitle", { fg = C.light_grey, bg = C.dark_navy, bold = true })
+hi("SnacksPickerListCursorLine", { fg = C.light_grey, bg = C.deep_blue })
+
+hi("SnacksPickerPreview", { fg = C.light_grey, bg = C.dark_navy })
+hi("SnacksPickerPreviewBorder", { fg = C.ash_grey, bg = C.dark_navy })
+hi("SnacksPickerPreviewTitle", { fg = C.light_grey, bg = C.dark_navy, bold = true })
+hi("SnacksPickerPreviewLine", { fg = C.light_grey, bg = C.deep_blue })
+
+hi("SnacksPickerMatch", { fg = C.muted_slate, bg = C.dark_navy, bold = true })
+hi("SnacksPickerDir", { fg = C.muted_cyan, bg = C.dark_navy })
+hi("SnacksPickerFile", { fg = C.light_grey, bg = C.dark_navy })
+hi("SnacksPickerSelected", { fg = C.pale_blue, bg = C.deep_blue, bold = true })
+hi("SnacksPickerIdx", { fg = C.steel_grey, bg = C.dark_navy })
+hi("SnacksPickerRow", { fg = C.steel_grey, bg = C.dark_navy })
+hi("SnacksPickerCol", { fg = C.steel_grey, bg = C.dark_navy })
+hi("SnacksPickerComment", { fg = C.soft_green, bg = C.dark_navy, italic = true })
+hi("SnacksPickerLabel", { fg = C.sand_yellow, bg = C.dark_navy, bold = true })
+
+---------------------------------------------------------------------
 -- noice.nvim — navy background, subtle borders, diag-linked severities
 ---------------------------------------------------------------------
 ---- Generic popups/splits

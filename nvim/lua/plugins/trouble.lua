@@ -5,6 +5,12 @@ return {
         modes = {
             diagnostics = {
                 focus = true,
+                preview = {
+                    type = "split",
+                    relative = "win",
+                    position = "right",
+                    size = 0.5,
+                },
             },
         },
     },

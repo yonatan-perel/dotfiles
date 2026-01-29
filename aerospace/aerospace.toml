@@ -80,7 +80,7 @@ outer.right =      0
 # All possible modifiers: cmd, alt, ctrl, shift
 
 # App based hotkeys
-alt-t = ['exec-and-forget open /Applications/wezterm.app'] # Terminal
+alt-t = ['exec-and-forget open /Applications/WezTerm.app'] # Terminal
 alt-b = ['exec-and-forget open /Applications/Google\ Chrome.app' ] # Browser
 alt-s = ['exec-and-forget open /Applications/Slack.app'] # Slack
 alt-w = ['exec-and-forget open /Applications/WhatsApp.app'] # Whatsapp

@@ -4,7 +4,8 @@ origin_url = "local"
 
 [colors]
 foreground = "#d8d8d8"  # light-grey
-background = "#11161c"  # dark-navy
+# background = "#11161c"  # dark-navy (original)
+background = "#0e0e16"  # dark purple-navy
 
 cursor_bg = "#d8d8d8"
 cursor_fg = "#1f2430"
@@ -20,7 +21,7 @@ split = "#858d95"
 ansi = [
   "#101010", # 0 black
   "#ef6f6f", # 1 red
-  "#96ca96", # 2 green
+  "#8ac490", # 2 green
   "#d8c6a0", # 3 yellow (beige)
   "#adc7e6", # 4 blue
   "#d58ca6", # 5 magenta (rosy-pink)
@@ -31,7 +32,7 @@ ansi = [
 brights = [
   "#858d95", # 8 bright black (slate)
   "#ef6f6f", # 9 bright red
-  "#96ca96", # 10 bright green
+  "#8ac490", # 10 bright green
   "#e0d2b6", # 11 bright yellow (lighter beige)
   "#adc7e6", # 12 bright blue
   "#d58ca6", # 13 bright magenta

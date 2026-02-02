@@ -1,39 +1,11 @@
 return {
-    --{
-    --    'sainnhe/everforest',
-    --    lazy = false,
-    --    priority = 1000,
-    --    config = function()
-    --        vim.g.everforest_transparent_background = 2
-    --        vim.cmd.colorscheme('everforest')
-    --    end
-    --},
-    --{
-    --    "zenbones-theme/zenbones.nvim",
-    --    dependencies = "rktjmp/lush.nvim",
-    --    lazy = false,
-    --    priority = 1000,
-    --    config = function()
-    --        vim.g.seoulbones_transparent_background = true
-    --        vim.g.seoulbones_lighten_comments = 1000
-    --        vim.g.seoulbones_darken_comments = 0
-    --        vim.cmd.colorscheme('seoulbones')
-    --    end
-    --}
-    --{
-    --    'rebelot/kanagawa.nvim',
-    --    lazy = false,
-    --    priority = 1000,
-    --    config = function()
-    --        vim.cmd("colorscheme kanagawa-wave")
-    --    end
-    --}
-    --{
-    --    "mcauley-penney/techbase.nvim",
-    --    lazy = false,
-    --    config = function(_, opts)
-    --        vim.cmd.colorscheme("techbase")
-    --    end,
-    --    priority = 1000
-    --}
+    {
+        "yonatan-perel/lake-dweller.nvim",
+        lazy = false,
+        priority = 1000,
+        config = function()
+            require("lake-dweller").setup({ transparent = false, italic_comments = true })
+            vim.cmd.colorscheme("lake-dweller")
+        end,
+    },
 }

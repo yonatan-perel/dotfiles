@@ -4,7 +4,7 @@ return {
   config = function()
     require('lualine').setup({
       options = {
-        theme = 'lake-dweller',
+        theme = require("lualine.themes.lake-dweller"),
         component_separators = { left = '', right = '' },
         section_separators = { left = '', right = '' },
       },

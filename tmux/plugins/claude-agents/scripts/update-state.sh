@@ -25,10 +25,12 @@ STATE_FILE="$STATE_DIR/${PANE_ID}.state"
 
 set_attention() {
     local msg="$1"
+    local pane_title=$(tmux display-message -p -t "$PANE_ID" '#{pane_title}' 2>/dev/null)
     local session_name=$(tmux display-message -p -t "$PANE_ID" '#{session_name}' 2>/dev/null)
+    local window_name=$(tmux display-message -p -t "$PANE_ID" '#{window_name}' 2>/dev/null)
     echo "attention" > "$STATE_FILE"
-    terminal-notifier -title "Claude Code" -message "Claude needs your attention in ${session_name}!" -sound default &
-    tmux display-message "⚠ Claude needs your attention in ${session_name}!" &
+    terminal-notifier -title "Claude Code" -message "Claude Code needs attention at [${session_name}:${window_name}]!" -sound default &
+    tmux display-message -d 1500 "⚠ Claude Code needs attention at [${session_name}:${window_name}]!" &
     tmux refresh-client -S &
 }
 

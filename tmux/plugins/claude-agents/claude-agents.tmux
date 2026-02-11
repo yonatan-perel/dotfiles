@@ -9,6 +9,9 @@ chmod +x "$CURRENT_DIR/scripts/"*.sh
 # Set up keybinding to show popup (prefix + a)
 tmux bind-key a display-popup -E -w 80% -h 80% "bash $CURRENT_DIR/scripts/popup-sessions.sh"
 
+# Jump to next session needing attention (prefix + A)
+tmux bind-key A run-shell "bash $CURRENT_DIR/scripts/jump-to-attention.sh"
+
 # Add status bar indicator with periodic scanning
 STATUS_RIGHT=$(tmux show-option -gv status-right)
 

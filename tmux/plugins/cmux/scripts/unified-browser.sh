@@ -35,7 +35,8 @@ while true; do
         --no-header \
         --prompt '||| ' \
         --bind "$ib" \
-        --bind "start:reload(bash '$SCRIPT_DIR/unified-list.sh' '$current_session' | tee '$tmp_entries')+pos(2)" \
+        --bind "load:pos(2)" \
+        --bind "start:reload(bash '$SCRIPT_DIR/unified-list.sh' '$current_session' | tee '$tmp_entries')" \
         --bind 'j:down,k:up,q:abort' \
         --bind "ctrl-j:transform(bash '$SCRIPT_DIR/jump-worktree.sh' next {n} '$tmp_entries' '$tmp_mode')" \
         --bind "ctrl-k:transform(bash '$SCRIPT_DIR/jump-worktree.sh' prev {n} '$tmp_entries' '$tmp_mode')" \

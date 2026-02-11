@@ -29,7 +29,7 @@ while IFS='|' read -r session_name window_id window_name pane_id pane_title pane
     STATE="running"
     PRIORITY=1
     LAST_CHANGED=$(stat -f %m "$HOOK_STATE_FILE" 2>/dev/null || date +%s)
-    HOOK_STATE=$(cat "$HOOK_STATE_FILE" 2>/dev/null)
+    HOOK_STATE=$(<"$HOOK_STATE_FILE")
 
     case "$HOOK_STATE" in
         attention)

@@ -5,9 +5,9 @@ if [ "$1" = "init_pane" ]; then
     if [ -n "$session_dir" ] && [ -d "$session_dir" ]; then
         tmux send-keys -t "$TMUX_PANE" "cd '$session_dir'" C-m
 
-        local main_repo_dir="$session_dir"
+        main_repo_dir="$session_dir"
         if [ -f "$session_dir/.git" ] && git -C "$session_dir" rev-parse --git-dir > /dev/null 2>&1; then
-            local git_common_dir=$(cd "$session_dir" && git rev-parse --git-common-dir 2>/dev/null)
+            git_common_dir=$(cd "$session_dir" && git rev-parse --git-common-dir 2>/dev/null)
             if [ -n "$git_common_dir" ]; then
                 main_repo_dir=$(cd "$session_dir" && cd "$git_common_dir/.." && pwd)
             fi

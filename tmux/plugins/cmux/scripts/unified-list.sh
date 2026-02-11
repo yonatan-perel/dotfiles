@@ -6,7 +6,31 @@ if [ -z "$current_session" ]; then
 fi
 
 CLAUDE_STATE_FILE="/tmp/claude-agents-state.json"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
+tmp_worktrees=$(mktemp)
+trap "rm -f '$tmp_worktrees'" EXIT
+
+# Background: worktree enumeration (slow — N tmux + git calls)
+(
+    while IFS= read -r sess; do
+        root=$(tmux show-environment -t "$sess" SESSION_ROOT_DIR 2>/dev/null | cut -d= -f2-)
+        if [ -n "$root" ] && [ -d "$root" ]; then
+            base_repo="$root"
+            if [ -f "$root/.git" ]; then
+                common_dir=$(cd "$root" && git rev-parse --git-common-dir 2>/dev/null)
+                if [ -n "$common_dir" ]; then
+                    base_repo=$(cd "$root" && cd "$common_dir/.." && pwd)
+                fi
+            fi
+            printf '%s|%s|%s\n' "$sess" "$root" "$base_repo"
+        fi
+    done < <(tmux list-sessions -F '#{session_name}')
+) > "$tmp_worktrees" &
+WT_PID=$!
+
+# Foreground: scan Claude agents + parse (fast — single jq call)
+bash "$SCRIPT_DIR/scan-sessions.sh"
 CLAUDE_ENTRIES=""
 if [ -f "$CLAUDE_STATE_FILE" ]; then
     NOW=$(date +%s)
@@ -22,38 +46,31 @@ if [ -f "$CLAUDE_STATE_FILE" ]; then
         (.pane_title | gsub("^[^a-zA-Z0-9]+"; "") | if length > 40 then .[:37] + "..." else . end) as $pane |
         (.pane_id | ltrimstr("%") | tonumber % ($bots | length)) as $ri |
         $bots[$ri] as $bot |
+        "\(.session_name):\(.window_name)" as $loc |
         if .state == "attention" then
-            "claude|\(.pane_id)|\(.window_id)|\(.session_name)|attention\t    \u001b[33m⚠\u001b[0m \($bot) \($pane) \u001b[90m\($ago)\u001b[0m"
+            "claude|\(.pane_id)|\(.window_id)|\(.session_name)|attention\t    \u001b[33m⚠\u001b[0m \($bot) \($pane) \u001b[90m[\($loc)] \($ago)\u001b[0m"
         elif .state == "idle" then
-            "claude|\(.pane_id)|\(.window_id)|\(.session_name)|idle\t    \u001b[32m✓\u001b[0m \u001b[90m\($bot) \($pane) \($ago)\u001b[0m"
+            "claude|\(.pane_id)|\(.window_id)|\(.session_name)|idle\t    \u001b[32m✓\u001b[0m \u001b[90m\($bot) \($pane) [\($loc)] \($ago)\u001b[0m"
         else
-            "claude|\(.pane_id)|\(.window_id)|\(.session_name)|running\t    \u001b[36m⟳\u001b[0m \($bot) \($pane) \u001b[90m\($ago)\u001b[0m"
+            "claude|\(.pane_id)|\(.window_id)|\(.session_name)|running\t    \u001b[36m⟳\u001b[0m \($bot) \($pane) \u001b[90m[\($loc)] \($ago)\u001b[0m"
         end' "$CLAUDE_STATE_FILE" 2>/dev/null)
 fi
+
+# Wait for worktree data
+wait "$WT_PID"
 
 sessions=""
 repos=""
 repo_list=""
 
-while IFS= read -r sess; do
-    root=$(tmux show-environment -t "$sess" SESSION_ROOT_DIR 2>/dev/null | cut -d= -f2-)
-    if [ -n "$root" ] && [ -d "$root" ]; then
-        base_repo="$root"
-        if [ -f "$root/.git" ]; then
-            common_dir=$(cd "$root" && git rev-parse --git-common-dir 2>/dev/null)
-            if [ -n "$common_dir" ]; then
-                base_repo=$(cd "$root" && cd "$common_dir/.." && pwd)
-            fi
-        fi
-
-        sessions+="$sess|$root|$base_repo"$'\n'
-
-        if [[ "$repo_list" != *"|$base_repo|"* ]]; then
-            repo_list+="|$base_repo|"
-            repos+="$base_repo"$'\n'
-        fi
+while IFS='|' read -r sess root base_repo; do
+    [ -z "$sess" ] && continue
+    sessions+="$sess|$root|$base_repo"$'\n'
+    if [[ "$repo_list" != *"|$base_repo|"* ]]; then
+        repo_list+="|$base_repo|"
+        repos+="$base_repo"$'\n'
     fi
-done < <(tmux list-sessions -F '#{session_name}')
+done < "$tmp_worktrees"
 
 current_repo=""
 if [ -n "$current_session" ]; then

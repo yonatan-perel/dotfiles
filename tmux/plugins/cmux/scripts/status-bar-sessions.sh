@@ -20,42 +20,19 @@ COUNTS=$(jq -r --arg sess "$CURRENT_SESSION" '[
 ] | join(" ")' "$STATE_FILE" 2>/dev/null) || COUNTS="0 0 0 0 0 0"
 read -r ATTENTION IDLE RUNNING S_ATTENTION S_IDLE S_RUNNING <<< "$COUNTS"
 
-PARTS=()
+format_counts() {
+    local attn="$1" idle="$2" running="$3" result=""
+    [ "$attn" -gt 0 ] && result+="#[fg=yellow,bold]⚠${attn}#[default]"
+    [ "$idle" -gt 0 ] && { [ -n "$result" ] && result+=" "; result+="#[fg=green]✓${idle}#[default]"; }
+    [ "$running" -gt 0 ] && { [ -n "$result" ] && result+=" "; result+="#[fg=blue]⟳${running}#[default]"; }
+    printf '%s' "$result"
+}
 
-if [ "$ATTENTION" -gt 0 ]; then
-    PARTS+=("#[fg=yellow,bold]⚠${ATTENTION}#[default]")
-fi
-if [ "$IDLE" -gt 0 ]; then
-    PARTS+=("#[fg=green]✓${IDLE}#[default]")
-fi
-if [ "$RUNNING" -gt 0 ]; then
-    PARTS+=("#[fg=blue]⟳${RUNNING}#[default]")
-fi
+OUTPUT=$(format_counts "$ATTENTION" "$IDLE" "$RUNNING")
 
-OUTPUT=""
-for i in "${!PARTS[@]}"; do
-    [ "$i" -gt 0 ] && OUTPUT+=" "
-    OUTPUT+="${PARTS[$i]}"
-done
-
-# Append current-session counts if different from global
 if [ -n "$OUTPUT" ] && \
    [ "$S_ATTENTION" != "$ATTENTION" -o "$S_IDLE" != "$IDLE" -o "$S_RUNNING" != "$RUNNING" ]; then
-    S_PARTS=()
-    if [ "$S_ATTENTION" -gt 0 ]; then
-        S_PARTS+=("#[fg=yellow,bold]⚠${S_ATTENTION}#[default]")
-    fi
-    if [ "$S_IDLE" -gt 0 ]; then
-        S_PARTS+=("#[fg=green]✓${S_IDLE}#[default]")
-    fi
-    if [ "$S_RUNNING" -gt 0 ]; then
-        S_PARTS+=("#[fg=blue]⟳${S_RUNNING}#[default]")
-    fi
-    SESS_OUTPUT=""
-    for i in "${!S_PARTS[@]}"; do
-        [ "$i" -gt 0 ] && SESS_OUTPUT+=" "
-        SESS_OUTPUT+="${S_PARTS[$i]}"
-    done
+    SESS_OUTPUT=$(format_counts "$S_ATTENTION" "$S_IDLE" "$S_RUNNING")
     if [ -n "$SESS_OUTPUT" ]; then
         OUTPUT+=" #[default](${SESS_OUTPUT}#[default])"
     else
@@ -66,7 +43,6 @@ fi
 # Only show if there are sessions
 if [ -n "$OUTPUT" ]; then
     TOTAL=$((ATTENTION + IDLE + RUNNING))
-    THIN_SPACE=$'\xe2\x80\x89'
     ICON=$'\xf3\xb1\x9a\x9f'
     echo "${TOTAL}_${ICON}  ${OUTPUT}"
 fi

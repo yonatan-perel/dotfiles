@@ -18,35 +18,29 @@ pk="a,b,c,e,f,g,h,i,l,m,o,p,r,s,t,u,v,w,z,0,1,2,3,4,5,6,7,8,9,space"
 ib="${pk//,/:ignore,}:ignore"
 
 while true; do
-    clear
-    bash "$SCRIPT_DIR/scan-sessions.sh"
-    entries=$(bash "$SCRIPT_DIR/unified-list.sh" "$current_session")
-
-    if [ -z "$entries" ]; then
-        echo "No worktrees found"
-        exit 0
-    fi
-
     echo "" > "$tmp_action"
-    printf '%s' "$entries" > "$tmp_entries"
 
-    selected=$(printf '%s' "$entries" | fzf --ansi \
-        --sync \
+    selected=$(: | fzf --ansi \
         --disabled \
         --layout=reverse \
         --delimiter $'\t' \
         --with-nth 2 \
         --no-sort \
         --no-info \
+        --no-hscroll \
+        --no-scrollbar \
+        --pointer='' \
+        --marker='' \
+        --ellipsis='' \
         --no-header \
-        --prompt '  ' \
+        --prompt '||| ' \
         --bind "$ib" \
-        --bind "start:pos(2)" \
+        --bind "start:reload(bash '$SCRIPT_DIR/unified-list.sh' '$current_session' | tee '$tmp_entries')+pos(2)" \
         --bind 'j:down,k:up,q:abort' \
         --bind "ctrl-j:transform(bash '$SCRIPT_DIR/jump-worktree.sh' next {n} '$tmp_entries' '$tmp_mode')" \
         --bind "ctrl-k:transform(bash '$SCRIPT_DIR/jump-worktree.sh' prev {n} '$tmp_entries' '$tmp_mode')" \
         --bind "/:execute-silent(echo search > '$tmp_mode')+unbind(j,k,d,x,a,q,$pk)+enable-search+transform-prompt(printf '/ ')" \
-        --bind "esc:execute-silent(echo normal > '$tmp_mode')+reload(bash '$SCRIPT_DIR/reload-list.sh' '$current_session' > '$tmp_entries'; cat '$tmp_entries')+rebind(j,k,d,x,a,q,/,$pk)+disable-search+clear-query+transform-prompt(printf '  ')" \
+        --bind "esc:execute-silent(echo normal > '$tmp_mode')+reload(bash '$SCRIPT_DIR/reload-list.sh' '$current_session' > '$tmp_entries'; cat '$tmp_entries')+rebind(j,k,d,x,a,q,/,$pk)+disable-search+clear-query+transform-prompt(printf '||| ')" \
         --bind "d:execute-silent(echo close > '$tmp_action')+accept" \
         --bind "x:execute-silent(echo remove > '$tmp_action')+accept" \
         --bind "a:reload(

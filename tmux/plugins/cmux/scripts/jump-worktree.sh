@@ -5,7 +5,11 @@ ENTRIES="$3"
 MODE_FILE="$4"
 
 if [ "$(cat "$MODE_FILE" 2>/dev/null)" = "search" ]; then
-    [ "$DIR" = "next" ] && echo "down" || echo "up"
+    if [ "$DIR" = "next" ]; then
+        echo "down+transform(echo {} | cut -f1 | grep -q '^header' && echo down)"
+    else
+        echo "up+transform(echo {} | cut -f1 | grep -q '^header' && { [ {n} -eq 0 ] && echo down || echo up; })"
+    fi
     exit 0
 fi
 

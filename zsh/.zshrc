@@ -52,4 +52,4 @@ export PATH="$HOME/.local/bin:$PATH"
 eval "$(mise activate zsh)"
 
 # Tmux auto session cd
-source ~/.tmux/plugins/tmux-auto-session-cd/scripts/auto-session-cd.sh
+source ~/.config/tmux/plugins/cmux/scripts/auto-session-cd.sh

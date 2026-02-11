@@ -1,26 +1,26 @@
 #!/bin/bash
-# Jump to the next Claude session that needs attention
-
-STATE_FILE="/tmp/claude-agents-state.json"
+STATE_FILE="/tmp/claude-agents-state.tsv"
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 
 bash "$SCRIPT_DIR/scan-sessions.sh"
 
-if [ ! -f "$STATE_FILE" ]; then
+if [ ! -f "$STATE_FILE" ] || [ ! -s "$STATE_FILE" ]; then
     tmux display-message -d 1500 "No Claude sessions found"
     exit 0
 fi
 
-AGENT=$(jq -r '.sessions[] | select(.state == "attention") | @json' "$STATE_FILE" 2>/dev/null | head -1)
+SESSION_NAME="" WINDOW_ID="" PANE_ID="" WINDOW_NAME="" PANE_TITLE=""
+while IFS=$'\t' read -r _ sn wid wn pid pt _ _ state; do
+    if [ "$state" = "attention" ]; then
+        SESSION_NAME="$sn" WINDOW_ID="$wid" WINDOW_NAME="$wn" PANE_ID="$pid" PANE_TITLE="$pt"
+        break
+    fi
+done < "$STATE_FILE"
 
-if [ -z "$AGENT" ] || [ "$AGENT" = "null" ]; then
+if [ -z "$PANE_ID" ]; then
     tmux display-message -d 1500 "No Claude sessions need attention"
     exit 0
 fi
-
-IFS=$'\t' read -r SESSION_NAME WINDOW_ID PANE_ID WINDOW_NAME PANE_TITLE < <(
-    echo "$AGENT" | jq -r '[.session_name, .window_id, .pane_id, .window_name, .pane_title] | @tsv'
-)
 
 if ! tmux list-panes -a -F "#{pane_id}" | grep -q "^${PANE_ID}$"; then
     tmux display-message -d 1500 "Pane no longer exists"

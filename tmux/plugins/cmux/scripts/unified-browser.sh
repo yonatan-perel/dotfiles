@@ -20,7 +20,8 @@ ib="${pk//,/:ignore,}:ignore"
 while true; do
     echo "" > "$tmp_action"
 
-    selected=$(: | fzf --ansi \
+    bash "$SCRIPT_DIR/unified-list.sh" "$current_session" --cached > "$tmp_entries"
+    selected=$(cat "$tmp_entries" | fzf --ansi \
         --disabled \
         --layout=reverse \
         --delimiter $'\t' \
@@ -36,11 +37,16 @@ while true; do
         --prompt '||| ' \
         --bind "$ib" \
         --bind "load:pos(2)" \
+        --bind "result:transform(echo {} | cut -f1 | grep -q '^header' && echo down)" \
         --bind "start:reload(bash '$SCRIPT_DIR/unified-list.sh' '$current_session' | tee '$tmp_entries')" \
-        --bind 'j:down,k:up,q:abort' \
+        --bind "j:down+transform(echo {} | cut -f1 | grep -q '^header' && echo down)" \
+        --bind "k:up+transform(echo {} | cut -f1 | grep -q '^header' && { [ {n} -eq 0 ] && echo down || echo up; })" \
+        --bind "down:down+transform(echo {} | cut -f1 | grep -q '^header' && echo down)" \
+        --bind "up:up+transform(echo {} | cut -f1 | grep -q '^header' && { [ {n} -eq 0 ] && echo down || echo up; })" \
+        --bind 'q:abort' \
         --bind "ctrl-j:transform(bash '$SCRIPT_DIR/jump-worktree.sh' next {n} '$tmp_entries' '$tmp_mode')" \
         --bind "ctrl-k:transform(bash '$SCRIPT_DIR/jump-worktree.sh' prev {n} '$tmp_entries' '$tmp_mode')" \
-        --bind "/:execute-silent(echo search > '$tmp_mode')+unbind(j,k,d,x,a,q,$pk)+enable-search+transform-prompt(printf '/ ')" \
+        --bind "/:execute-silent(echo search > '$tmp_mode')+unbind(j,k,d,x,a,q,$pk)+reload(bash '$SCRIPT_DIR/unified-list.sh' '$current_session' --search | tee '$tmp_entries')+enable-search+transform-prompt(printf '/ ')" \
         --bind "esc:execute-silent(echo normal > '$tmp_mode')+reload(bash '$SCRIPT_DIR/reload-list.sh' '$current_session' > '$tmp_entries'; cat '$tmp_entries')+rebind(j,k,d,x,a,q,/,$pk)+disable-search+clear-query+transform-prompt(printf '||| ')" \
         --bind "d:execute-silent(echo close > '$tmp_action')+accept" \
         --bind "x:execute-silent(echo remove > '$tmp_action')+accept" \

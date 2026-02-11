@@ -1,24 +1,20 @@
 #!/bin/bash
-# Status bar indicator for Claude Code sessions with state colors
+STATE_FILE="/tmp/claude-agents-state.tsv"
 
-STATE_FILE="/tmp/claude-agents-state.json"
-
-if [ ! -f "$STATE_FILE" ]; then
+if [ ! -f "$STATE_FILE" ] || [ ! -s "$STATE_FILE" ]; then
     exit 0
 fi
 
 CURRENT_SESSION=$(tmux display-message -p '#S' 2>/dev/null)
 
-# Count by state (global + current session)
-COUNTS=$(jq -r --arg sess "$CURRENT_SESSION" '[
-    ([.sessions[] | select(.state == "attention")] | length | tostring),
-    ([.sessions[] | select(.state == "idle")] | length | tostring),
-    ([.sessions[] | select(.state == "running")] | length | tostring),
-    ([.sessions[] | select(.state == "attention" and .session_name == $sess)] | length | tostring),
-    ([.sessions[] | select(.state == "idle" and .session_name == $sess)] | length | tostring),
-    ([.sessions[] | select(.state == "running" and .session_name == $sess)] | length | tostring)
-] | join(" ")' "$STATE_FILE" 2>/dev/null) || COUNTS="0 0 0 0 0 0"
-read -r ATTENTION IDLE RUNNING S_ATTENTION S_IDLE S_RUNNING <<< "$COUNTS"
+ATTENTION=0 IDLE=0 RUNNING=0 S_ATTENTION=0 S_IDLE=0 S_RUNNING=0
+while IFS=$'\t' read -r _ session_name _ _ _ _ _ _ state; do
+    case "$state" in
+        attention) ((ATTENTION++)); [ "$session_name" = "$CURRENT_SESSION" ] && ((S_ATTENTION++)) ;;
+        idle)      ((IDLE++));      [ "$session_name" = "$CURRENT_SESSION" ] && ((S_IDLE++)) ;;
+        running)   ((RUNNING++));   [ "$session_name" = "$CURRENT_SESSION" ] && ((S_RUNNING++)) ;;
+    esac
+done < "$STATE_FILE"
 
 format_counts() {
     local attn="$1" idle="$2" running="$3" result=""

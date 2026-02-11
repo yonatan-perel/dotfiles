@@ -62,31 +62,20 @@ _auto_session_cd_setup() {
 
             if git rev-parse --git-dir > /dev/null 2>&1; then
                 local dir_name=$(basename "$current_dir")
+                # Transform session name to replace special characters
+                local session_name=$(echo "$dir_name" | tr './:' '_')
 
-                if [ -n "$dir_name" ]; then
-                    tmux rename-session "$dir_name"
+                if [ -n "$session_name" ]; then
+                    tmux rename-session "$session_name"
                     tmux set-environment SESSION_ROOT_DIR "$current_dir"
                     tmux set-environment SESSION_INITIALIZED "1"
 
-                    local main_repo_dir="$current_dir"
-                    if [ -f "$current_dir/.git" ]; then
-                        local git_common_dir=$(git rev-parse --git-common-dir 2>/dev/null)
-                        if [ -n "$git_common_dir" ]; then
-                            main_repo_dir=$(cd "$git_common_dir/.." && pwd)
-                        fi
+                    # Use common setup script
+                    local script_path=$(tmux show-environment -g TMUX_AUTO_SESSION_CD_PLUGIN 2>/dev/null | cut -d= -f2-)
+                    if [ -n "$script_path" ]; then
+                        local script_dir="$(dirname "$script_path")"
+                        "$script_dir/setup-session.sh" "$session_name" "$current_dir"
                     fi
-
-                    if [ -f "$current_dir/.env" ]; then
-                        set -a && source .env && set +a
-                    fi
-                    if [ -f "$main_repo_dir/.env.me" ]; then
-                        set -a && source "$main_repo_dir/.env.me" && set +a
-                    fi
-
-                    tmux rename-window "vim"
-                    tmux new-window -n "cli"
-                    tmux new-window -n "agent"
-                    tmux select-window -t 1
                 fi
             fi
         fi

@@ -28,3 +28,6 @@ vim.opt.signcolumn = "yes"
 vim.opt.isfname:append("@-@")
 
 vim.opt.updatetime = 50
+
+vim.o.winborder = "single"
+vim.api.nvim_set_hl(0, "FloatBorder", { link = "Normal" })

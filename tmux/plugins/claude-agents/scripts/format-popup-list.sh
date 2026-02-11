@@ -1,5 +1,4 @@
 #!/bin/bash
-# Format the state JSON into fzf-friendly lines. Does NOT rescan.
 STATE_FILE="/tmp/claude-agents-state.json"
 
 NOW=$(date +%s)
@@ -11,9 +10,9 @@ jq -r --argjson now "$NOW" '.sessions | to_entries[] |
      else "\(. / 86400 | floor)d" end) as $ago |
     (.value.pane_title | if length > 40 then .[:37] + "..." else . end) as $pane |
     if .value.state == "confirmation" then
-        "\(.key)|\(.value.pane_id)|\(.value.window_id)|\(.value.session_name)|confirmation|⚠ \($ago) ago - \($pane) [\(.value.session_name):\(.value.window_name)]"
+        "\(.key)|\(.value.pane_id)|\(.value.window_id)|\(.value.session_name)|confirmation\t  \u001b[33m⚠\u001b[0m \($ago) ago - \($pane) [\u001b[33m\(.value.session_name):\(.value.window_name)\u001b[0m]"
     elif .value.state == "idle" then
-        "\(.key)|\(.value.pane_id)|\(.value.window_id)|\(.value.session_name)|idle|✓ \($ago) ago - \($pane) [\(.value.session_name):\(.value.window_name)]"
+        "\(.key)|\(.value.pane_id)|\(.value.window_id)|\(.value.session_name)|idle\t  \u001b[32m✓\u001b[0m \($ago) ago - \u001b[90m\($pane) [\(.value.session_name):\(.value.window_name)]\u001b[0m"
     else
-        "\(.key)|\(.value.pane_id)|\(.value.window_id)|\(.value.session_name)|running|⟳ \($ago) ago - \($pane) [\(.value.session_name):\(.value.window_name)]"
+        "\(.key)|\(.value.pane_id)|\(.value.window_id)|\(.value.session_name)|running\t  \u001b[36m⟳\u001b[0m \($ago) ago - \($pane) [\u001b[33m\(.value.session_name):\(.value.window_name)\u001b[0m]"
     end' "$STATE_FILE"

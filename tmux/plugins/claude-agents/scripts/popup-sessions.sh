@@ -1,5 +1,4 @@
 #!/bin/bash
-# Show popup with Claude Code sessions using fzf
 
 STATE_FILE="/tmp/claude-agents-state.json"
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
@@ -19,26 +18,29 @@ if [ "$SESSION_COUNT" -eq 0 ]; then
 fi
 
 SELECTED=$(bash "$SCRIPT_DIR/format-popup-list.sh" | fzf \
-    --height=100% \
-    --reverse \
     --ansi \
-    --prompt="Claude Sessions > " \
-    --no-header \
-    --bind='ctrl-j:down,ctrl-k:up' \
-    --bind="ctrl-a:execute-silent(bash $SCRIPT_DIR/toggle-attention.sh {2})+reload(bash $SCRIPT_DIR/build-popup-list.sh)" \
-    --delimiter='\|' \
-    --with-nth=6 \
+    --disabled \
+    --layout=reverse \
+    --delimiter $'\t' \
+    --with-nth 2 \
+    --no-sort \
     --no-info \
-    --pointer="▶" \
-    --color=16)
+    --no-header \
+    --bind 'j:down,k:up,q:abort' \
+    --bind '/:unbind(j,k,a,q)+enable-search' \
+    --bind 'esc:rebind(j,k,a,q)+disable-search+clear-query' \
+    --bind "a:execute-silent(
+        pane_id=\$(echo {} | cut -f1 | cut -d'|' -f2)
+        bash '$SCRIPT_DIR/toggle-attention.sh' \"\$pane_id\"
+    )+reload(bash '$SCRIPT_DIR/build-popup-list.sh')")
 
 if [ -z "$SELECTED" ]; then
     exit 0
 fi
 
-PANE_ID=$(echo "$SELECTED" | cut -d'|' -f2)
-WINDOW_ID=$(echo "$SELECTED" | cut -d'|' -f3)
-SESSION_NAME=$(echo "$SELECTED" | cut -d'|' -f4)
+PANE_ID=$(echo "$SELECTED" | cut -f1 | cut -d'|' -f2)
+WINDOW_ID=$(echo "$SELECTED" | cut -f1 | cut -d'|' -f3)
+SESSION_NAME=$(echo "$SELECTED" | cut -f1 | cut -d'|' -f4)
 
 if [ -n "$PANE_ID" ] && [ "$PANE_ID" != "null" ]; then
     tmux switch-client -t "$SESSION_NAME"

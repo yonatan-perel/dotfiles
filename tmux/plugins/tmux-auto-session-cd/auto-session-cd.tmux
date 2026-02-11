@@ -14,3 +14,4 @@ tmux set-environment -g TMUX_AUTO_SESSION_DESTROY_SCRIPT "$CURRENT_DIR/scripts/d
 # Key bindings
 tmux bind-key N command-prompt -p "Create session at path:" "run-shell '$CURRENT_DIR/scripts/create-session.sh \"%%\"'"
 tmux bind-key D run-shell "$CURRENT_DIR/scripts/destroy-session.sh"
+tmux bind-key s display-popup -E -w 70% -h 60% "bash $CURRENT_DIR/scripts/worktree-browser.sh"

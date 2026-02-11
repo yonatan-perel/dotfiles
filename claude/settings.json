@@ -16,16 +16,6 @@
       "Read(./.env.*)"
     ]
   },
-  "statusLine": {
-    "type": "command",
-    "command": "npx -y ccstatusline@latest",
-    "padding": 0
-  },
-  "enabledPlugins": {
-    "gopls-lsp@claude-plugins-official": true,
-    "lua-lsp@claude-plugins-official": true,
-    "clangd-lsp@claude-plugins-official": true
-  },
   "hooks": {
     "SessionStart": [
       {
@@ -87,5 +77,16 @@
         ]
       }
     ]
-  }
+  },
+  "statusLine": {
+    "type": "command",
+    "command": "npx -y ccstatusline@latest",
+    "padding": 0
+  },
+  "enabledPlugins": {
+    "gopls-lsp@claude-plugins-official": true,
+    "lua-lsp@claude-plugins-official": true,
+    "clangd-lsp@claude-plugins-official": true
+  },
+  "model": "sonnet"
 }

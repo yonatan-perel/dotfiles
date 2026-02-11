@@ -2,7 +2,9 @@ return {
     "folke/noice.nvim",
     event = "VeryLazy",
     opts = {
-        -- add any options here
+        presets = {
+            lsp_doc_border = true,
+        },
     },
     dependencies = {
         "MunifTanjim/nui.nvim",

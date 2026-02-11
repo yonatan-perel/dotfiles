@@ -46,7 +46,7 @@ SELECTED=$(echo "$SESSIONS" | fzf \
     --reverse \
     --ansi \
     --prompt="Claude Sessions > " \
-    --header="⚠=needs approval | ✓=idle | ⟳=running | C-j/k: navigate | Enter: jump" \
+    --header="⚠=needs attention | ✓=idle | ⟳=running | C-j/k: navigate | Enter: jump" \
     --bind='ctrl-j:down,ctrl-k:up' \
     --delimiter='\|' \
     --with-nth=6 \

@@ -6,6 +6,16 @@ cat > /dev/null
 
 mkdir -p "$STATE_DIR"
 
+if [ "$HOOK_TYPE" = "focus" ]; then
+    PANE_ID=$(tmux display-message -p '#{pane_id}' 2>/dev/null)
+    STATE_FILE="$STATE_DIR/${PANE_ID}.state"
+    if [ -f "$STATE_FILE" ] && [ "$(cat "$STATE_FILE" 2>/dev/null)" = "attention" ]; then
+        echo "idle" > "$STATE_FILE"
+        tmux refresh-client -S &
+    fi
+    exit 0
+fi
+
 PANE_ID="${TMUX_PANE}"
 if [ -z "$PANE_ID" ]; then
     exit 0

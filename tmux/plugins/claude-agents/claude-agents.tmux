@@ -21,3 +21,7 @@ fi
 
 # Set status interval for updates (every 2 seconds)
 tmux set-option -g status-interval 2
+
+# Clear attention state when focusing a Claude pane
+tmux set-hook -g window-pane-changed "run-shell -b 'bash $CURRENT_DIR/scripts/update-state.sh focus'"
+tmux set-hook -g session-window-changed "run-shell -b 'bash $CURRENT_DIR/scripts/update-state.sh focus'"

@@ -13,22 +13,37 @@ fi
 
 STATE_FILE="$STATE_DIR/${PANE_ID}.state"
 
+set_attention() {
+    local msg="$1"
+    local session_name=$(tmux display-message -p -t "$PANE_ID" '#{session_name}' 2>/dev/null)
+    echo "attention" > "$STATE_FILE"
+    terminal-notifier -title "Claude Code" -message "Claude needs your attention in ${session_name}!" -sound default &
+    tmux display-message "⚠ Claude needs your attention in ${session_name}!" &
+    tmux refresh-client -S &
+}
+
 echo "$(date +%H:%M:%S) hook=$HOOK_TYPE pane=$PANE_ID" >> "$STATE_DIR/debug.log"
 
 case "$HOOK_TYPE" in
-    pre_tool|post_tool|post_tool_fail|prompt_submit)
+    session_start)
+        echo "idle" > "$STATE_FILE"
+        ;;
+    prompt_submit|running)
         echo "running" > "$STATE_FILE"
         ;;
     stop)
-        echo "idle" > "$STATE_FILE"
-        terminal-notifier -title "Claude Code" -message "Session finished" -sound default &
-        tmux display-message "✓ Claude Code session finished" &
+        if tmux list-panes -a -F '#{pane_active}#{window_active}#{session_attached} #{pane_id}' 2>/dev/null | grep -q "^111 ${PANE_ID}$"; then
+            echo "idle" > "$STATE_FILE"
+        else
+            set_attention "Session finished"
+        fi
+        tmux refresh-client -S &
+        ;;
+    exit)
+        rm -f "$STATE_FILE"
         tmux refresh-client -S &
         ;;
     notification)
-        echo "attention" > "$STATE_FILE"
-        terminal-notifier -title "Claude Code" -message "Session needs your attention" -sound default &
-        tmux display-message "⚠ Claude Code needs your attention" &
-        tmux refresh-client -S &
+        set_attention "Session needs your attention"
         ;;
 esac

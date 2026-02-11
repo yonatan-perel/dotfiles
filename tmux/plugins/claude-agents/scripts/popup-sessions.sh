@@ -25,13 +25,19 @@ fi
 
 # Build fzf input with format: index|pane_id|window_id|session_name|state|display_text
 # Add colored indicator based on state
-SESSIONS=$(jq -r '.sessions | to_entries[] |
+NOW=$(date +%s)
+SESSIONS=$(jq -r --argjson now "$NOW" '.sessions | to_entries[] |
+    (.value.last_changed // $now) as $lc |
+    (($now - $lc) | if . < 60 then "\(.)s"
+     elif . < 3600 then "\(. / 60 | floor)m"
+     elif . < 86400 then "\(. / 3600 | floor)h"
+     else "\(. / 86400 | floor)d" end) as $ago |
     if .value.state == "confirmation" then
-        "\(.key)|\(.value.pane_id)|\(.value.window_id)|\(.value.session_name)|confirmation|⚠ \(.value.pane_title) [\(.value.project)]"
+        "\(.key)|\(.value.pane_id)|\(.value.window_id)|\(.value.session_name)|confirmation|⚠ \($ago) ago · \(.value.pane_title) [\(.value.project)]"
     elif .value.state == "idle" then
-        "\(.key)|\(.value.pane_id)|\(.value.window_id)|\(.value.session_name)|idle|✓ \(.value.pane_title) [\(.value.project)]"
+        "\(.key)|\(.value.pane_id)|\(.value.window_id)|\(.value.session_name)|idle|✓ \($ago) ago · \(.value.pane_title) [\(.value.project)]"
     else
-        "\(.key)|\(.value.pane_id)|\(.value.window_id)|\(.value.session_name)|running|⟳ \(.value.pane_title) [\(.value.project)]"
+        "\(.key)|\(.value.pane_id)|\(.value.window_id)|\(.value.session_name)|running|⟳ \($ago) ago · \(.value.pane_title) [\(.value.project)]"
     end' "$STATE_FILE")
 
 # Use fzf for selection with vim keybindings and ANSI colors

@@ -21,8 +21,8 @@ tmux bind-key D run-shell "$CURRENT_DIR/scripts/destroy-session.sh"
 tmux bind-key s display-popup -E -w 70% -h 60% "bash $CURRENT_DIR/scripts/unified-browser.sh"
 
 # Key bindings - Claude agents
-tmux bind-key a run-shell "bash $CURRENT_DIR/scripts/jump-to-attention.sh"
-tmux bind-key A run-shell "bash $CURRENT_DIR/scripts/update-state.sh dismiss"
+tmux bind-key C-a run-shell "bash $CURRENT_DIR/scripts/jump-to-attention.sh"
+tmux bind-key a run-shell "bash $CURRENT_DIR/scripts/update-state.sh dismiss"
 
 # Add Claude agents status bar indicator
 STATUS_RIGHT=$(tmux show-option -gv status-right)

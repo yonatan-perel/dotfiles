@@ -12,7 +12,7 @@ if [ ! -f "$STATE_FILE" ]; then
     exit 0
 fi
 
-AGENT=$(jq -r '.sessions[] | select(.state == "confirmation") | @json' "$STATE_FILE" 2>/dev/null | head -1)
+AGENT=$(jq -r '.sessions[] | select(.state == "attention") | @json' "$STATE_FILE" 2>/dev/null | head -1)
 
 if [ -z "$AGENT" ] || [ "$AGENT" = "null" ]; then
     tmux display-message -d 1500 "No Claude sessions need attention"

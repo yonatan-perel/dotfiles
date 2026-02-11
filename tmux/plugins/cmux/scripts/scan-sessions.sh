@@ -5,9 +5,18 @@ HOOK_STATE_DIR="/tmp/claude-agents"
 PANES=$(tmux list-panes -a -F "#{session_name}|#{window_id}|#{window_name}|#{pane_id}|#{pane_title}|#{pane_current_path}" 2>/dev/null)
 
 if [ -z "$PANES" ]; then
-    echo '{"sessions":[],"updated_at":""}' > "$STATE_FILE"
+    TMPFILE=$(mktemp "${STATE_FILE}.XXXXXX")
+    echo '{"sessions":[],"updated_at":""}' > "$TMPFILE"
+    mv "$TMPFILE" "$STATE_FILE"
     exit 0
 fi
+
+LIVE_PANE_IDS=$(echo "$PANES" | cut -d'|' -f4)
+for state_file in "$HOOK_STATE_DIR"/*.state; do
+    [ -f "$state_file" ] || continue
+    pane_id=$(basename "$state_file" .state)
+    echo "$LIVE_PANE_IDS" | grep -qxF "$pane_id" || rm -f "$state_file"
+done
 
 SESSIONS_NDJSON=""
 TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
@@ -24,7 +33,7 @@ while IFS='|' read -r session_name window_id window_name pane_id pane_title pane
 
     case "$HOOK_STATE" in
         attention)
-            STATE="confirmation"
+            STATE="attention"
             PRIORITY=0
             ;;
         idle)
@@ -37,8 +46,9 @@ while IFS='|' read -r session_name window_id window_name pane_id pane_title pane
 "
 done <<< "$PANES"
 
+TMPFILE=$(mktemp "${STATE_FILE}.XXXXXX")
 if [ -z "$SESSIONS_NDJSON" ]; then
-    echo "{\"sessions\":[],\"updated_at\":\"$TIMESTAMP\"}" > "$STATE_FILE"
+    echo "{\"sessions\":[],\"updated_at\":\"$TIMESTAMP\"}" > "$TMPFILE"
 else
     printf '%s' "$SESSIONS_NDJSON" | jq -Rn --arg time "$TIMESTAMP" '
         [inputs | split("\t") | {
@@ -52,5 +62,6 @@ else
             state: .[7],
             priority: (.[8] | tonumber),
             last_changed: (.[9] | tonumber)
-        }] | {sessions: (. | sort_by(.priority, -.last_changed)), updated_at: $time}' > "$STATE_FILE"
+        }] | {sessions: (. | sort_by(.priority, -.last_changed)), updated_at: $time}' > "$TMPFILE"
 fi
+mv "$TMPFILE" "$STATE_FILE"

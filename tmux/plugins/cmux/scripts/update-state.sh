@@ -2,8 +2,6 @@
 HOOK_TYPE="${1:-unknown}"
 STATE_DIR="/tmp/claude-agents"
 
-cat > /dev/null
-
 mkdir -p "$STATE_DIR"
 
 if [ "$HOOK_TYPE" = "dismiss" ]; then
@@ -22,6 +20,8 @@ if [ "$HOOK_TYPE" = "dismiss" ]; then
     fi
     exit 0
 fi
+
+cat > /dev/null
 
 PANE_ID="${TMUX_PANE}"
 if [ -z "$PANE_ID" ]; then

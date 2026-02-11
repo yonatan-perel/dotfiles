@@ -92,7 +92,7 @@ _auto_session_cd_setup
 tcs() {
     local script_path=$(tmux show-environment -g TMUX_AUTO_SESSION_CREATE_SCRIPT 2>/dev/null | cut -d= -f2-)
     if [ -z "$script_path" ]; then
-        script_path="$HOME/.tmux/plugins/tmux-auto-session-cd/scripts/create-session.sh"
+        script_path="$HOME/.config/tmux/plugins/cmux/scripts/create-session.sh"
     fi
 
     if [ -f "$script_path" ]; then
@@ -106,7 +106,7 @@ tcs() {
 tds() {
     local script_path=$(tmux show-environment -g TMUX_AUTO_SESSION_DESTROY_SCRIPT 2>/dev/null | cut -d= -f2-)
     if [ -z "$script_path" ]; then
-        script_path="$HOME/.tmux/plugins/tmux-auto-session-cd/scripts/destroy-session.sh"
+        script_path="$HOME/.config/tmux/plugins/cmux/scripts/destroy-session.sh"
     fi
 
     if [ -f "$script_path" ]; then

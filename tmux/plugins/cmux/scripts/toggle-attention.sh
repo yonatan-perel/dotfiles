@@ -11,5 +11,4 @@ if [ -f "$STATE_FILE" ]; then
     elif [ "$CURRENT" = "idle" ]; then
         echo "attention" > "$STATE_FILE"
     fi
-    tmux refresh-client -S &
 fi

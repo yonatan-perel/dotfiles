@@ -30,11 +30,6 @@ if ! tmux list-panes -a -F "#{pane_id}" | grep -q "^${PANE_ID}$"; then
     exit 1
 fi
 
-STATE="${HOOK_STATE_DIR}/${PANE_ID}.state"
-if [ -f "$STATE" ] && [ "$(cat "$STATE" 2>/dev/null)" = "attention" ]; then
-    echo "idle" > "$STATE"
-fi
-
 tmux switch-client -t "$SESSION_NAME"
 tmux select-window -t "$WINDOW_ID"
 tmux select-pane -t "$PANE_ID"

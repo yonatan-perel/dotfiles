@@ -7,10 +7,13 @@ CURRENT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 chmod +x "$CURRENT_DIR/scripts/"*.sh
 
 # Set up keybinding to show popup (prefix + a)
-tmux bind-key a display-popup -E -w 80% -h 80% "bash $CURRENT_DIR/scripts/popup-sessions.sh"
+tmux bind-key a display-popup -E -w 60% -h 50% "bash $CURRENT_DIR/scripts/popup-sessions.sh"
 
-# Jump to next session needing attention (prefix + A)
-tmux bind-key A run-shell "bash $CURRENT_DIR/scripts/jump-to-attention.sh"
+# Jump to next session needing attention (prefix + C-a)
+tmux bind-key C-a run-shell "bash $CURRENT_DIR/scripts/jump-to-attention.sh"
+
+# Toggle attention/idle on current pane (prefix + A)
+tmux bind-key A run-shell "bash $CURRENT_DIR/scripts/update-state.sh dismiss"
 
 # Add status bar indicator with periodic scanning
 STATUS_RIGHT=$(tmux show-option -gv status-right)
@@ -25,6 +28,3 @@ fi
 # Set status interval for updates (every 2 seconds)
 tmux set-option -g status-interval 2
 
-# Clear attention state when focusing a Claude pane
-tmux set-hook -g window-pane-changed "run-shell -b 'bash $CURRENT_DIR/scripts/update-state.sh focus'"
-tmux set-hook -g session-window-changed "run-shell -b 'bash $CURRENT_DIR/scripts/update-state.sh focus'"

@@ -6,11 +6,18 @@ cat > /dev/null
 
 mkdir -p "$STATE_DIR"
 
-if [ "$HOOK_TYPE" = "focus" ]; then
+if [ "$HOOK_TYPE" = "dismiss" ]; then
     PANE_ID=$(tmux display-message -p '#{pane_id}' 2>/dev/null)
     STATE_FILE="$STATE_DIR/${PANE_ID}.state"
-    if [ -f "$STATE_FILE" ] && [ "$(cat "$STATE_FILE" 2>/dev/null)" = "attention" ]; then
-        echo "idle" > "$STATE_FILE"
+    if [ -f "$STATE_FILE" ]; then
+        CURRENT=$(cat "$STATE_FILE" 2>/dev/null)
+        if [ "$CURRENT" = "attention" ]; then
+            echo "idle" > "$STATE_FILE"
+            tmux display-message -d 1500 "✓ Dismissed attention"
+        else
+            echo "attention" > "$STATE_FILE"
+            tmux display-message -d 1500 "⚠ Marked as needs attention"
+        fi
         tmux refresh-client -S &
     fi
     exit 0

@@ -1,0 +1,34 @@
+project_dirs:
+  - ~/Code/*
+  - ~/.config
+
+default:
+  windows:
+    - name: editor
+    - name: cli
+      command: "mise trust && clear"
+
+projects:
+  pointfive:
+    env:
+      - .env
+      - .env.me
+    windows:
+      - name: editor
+      - name: cli
+        command: "mise trust && clear"
+    worktree:
+      dir: "../worktrees"
+      symlinks:
+        - .env
+        - .env.prod
+        - node_modules
+        - .venv
+        - .memory
+        - .vscode/launch.json
+      copies:
+        - dbt/dbt_packages
+    linear:
+      api_key: $PF_LINEAR_API_KEY
+      team: $PF_LINEAR_TEAM
+      in_progress_status: $PF_LINEAR_IN_PROGRESS_STATUS_ID

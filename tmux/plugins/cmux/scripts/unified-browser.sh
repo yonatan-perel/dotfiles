@@ -45,10 +45,12 @@ while true; do
         --bind 'q:abort' \
         --bind "ctrl-j:transform(bash '$SCRIPT_DIR/jump-worktree.sh' next {n} '$tmp_entries' '$tmp_mode')" \
         --bind "ctrl-k:transform(bash '$SCRIPT_DIR/jump-worktree.sh' prev {n} '$tmp_entries' '$tmp_mode')" \
-        --bind "/:execute-silent(echo search > '$tmp_mode')+unbind(j,k,d,x,a,q,$pk)+reload(bash '$SCRIPT_DIR/unified-list.sh' '$current_session' --search | tee '$tmp_entries')+enable-search+transform-prompt(printf '/ ')" \
-        --bind "esc:execute-silent(echo normal > '$tmp_mode')+reload(bash '$SCRIPT_DIR/reload-list.sh' '$current_session' > '$tmp_entries'; cat '$tmp_entries')+rebind(j,k,d,x,a,q,/,$pk)+disable-search+clear-query+transform-prompt(printf '||| ')" \
+        --bind "/:execute-silent(echo search > '$tmp_mode')+unbind(j,k,d,x,a,q,S,A,$pk)+reload(bash '$SCRIPT_DIR/unified-list.sh' '$current_session' --search | tee '$tmp_entries')+enable-search+transform-prompt(printf '/ ')" \
+        --bind "esc:execute-silent(echo normal > '$tmp_mode')+reload(bash '$SCRIPT_DIR/reload-list.sh' '$current_session' > '$tmp_entries'; cat '$tmp_entries')+rebind(j,k,d,x,a,q,/,S,A,$pk)+disable-search+clear-query+transform-prompt(printf '||| ')" \
         --bind "d:execute-silent(echo close > '$tmp_action')+accept" \
         --bind "x:execute-silent(echo remove > '$tmp_action')+accept" \
+        --bind "S:execute-silent(echo new-worktree > '$tmp_action')+accept" \
+        --bind "A:execute-silent(echo new-bot > '$tmp_action')+accept" \
         --bind "a:reload(
             type=\$(echo {} | cut -f1 | cut -d'|' -f1)
             if [ \"\$type\" = \"claude\" ]; then
@@ -119,6 +121,19 @@ while true; do
                 printf "\r  \033[32mRemoved.\033[0m  "
                 sleep 0.5
             fi
+        fi
+        continue
+    fi
+
+    if [ "$action" = "new-bot" ]; then
+        if [ -n "$session" ]; then
+            bash "$SCRIPT_DIR/new-bot.sh" "$session"
+        fi
+        continue
+    elif [ "$action" = "new-worktree" ]; then
+        repo="$field4"
+        if [ -n "$repo" ] && [ -d "$repo" ]; then
+            exec bash "$SCRIPT_DIR/new-worktree.sh" "$repo"
         fi
         continue
     fi

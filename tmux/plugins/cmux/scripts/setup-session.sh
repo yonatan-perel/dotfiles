@@ -21,21 +21,19 @@ setup_session() {
         fi
     fi
 
-    # Source .env files in the first window
+    local script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
     local needs_clear=false
-    if [ -f "$target_path/.env" ]; then
-        tmux send-keys -t "$session_name:1" "set -a && source .env && set +a" C-m
-        needs_clear=true
-    fi
-    if [ -f "$main_repo_dir/.env.me" ]; then
-        tmux send-keys -t "$session_name:1" "set -a && source '$main_repo_dir/.env.me' && set +a" C-m
-        needs_clear=true
-    fi
+    while IFS= read -r env_file; do
+        [ -z "$env_file" ] && continue
+        if [ -f "$main_repo_dir/$env_file" ]; then
+            tmux send-keys -t "$session_name:1" "set -a && source '$main_repo_dir/$env_file' && set +a" C-m
+            needs_clear=true
+        fi
+    done < <(bash "$script_dir/parse-config.sh" env "$main_repo_dir")
     if [ "$needs_clear" = true ]; then
         tmux send-keys -t "$session_name:1" "clear" C-m
     fi
-
-    local script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
     local win_idx=1
 
     while IFS=$'\t' read -r wname wcmd; do
@@ -49,7 +47,7 @@ setup_session() {
             tmux send-keys -t "$session_name:$win_idx" "$wcmd" C-m
         fi
         win_idx=$((win_idx + 1))
-    done < <(bash "$script_dir/parse-config.sh" windows)
+    done < <(bash "$script_dir/parse-config.sh" windows "$main_repo_dir")
 
     local bot_name=$'\U000f06a9'
     if [ "$win_idx" -eq 1 ]; then

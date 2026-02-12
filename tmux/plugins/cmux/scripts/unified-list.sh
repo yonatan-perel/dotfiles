@@ -77,6 +77,7 @@ if [ "$use_cache" = true ]; then
 elif [ "$cached_only" != "--cached" ]; then
     while IFS= read -r sess; do
         root=$(tmux show-environment -t "$sess" SESSION_ROOT_DIR 2>/dev/null | cut -d= -f2-)
+        [ -z "$root" ] && root=$(tmux display-message -t "$sess" -p '#{pane_current_path}' 2>/dev/null)
         if [ -n "$root" ] && [ -d "$root" ]; then
             base_repo="$root"
             if [ -f "$root/.git" ]; then

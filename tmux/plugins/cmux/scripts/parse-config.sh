@@ -1,77 +1,49 @@
 #!/usr/bin/env bash
 
-CONFIG_FILE="${CMUX_CONFIG:-$HOME/.config/cmux/cmux.toml}"
+mode="$1"
+project_path="$2"
+
+CONFIG_FILE="${CMUX_CONFIG:-$HOME/.config/cmux/cmux.yaml}"
 
 if [ ! -f "$CONFIG_FILE" ]; then
     exit 0
 fi
 
-mode="$1"
+project_name=""
+if [ -n "$project_path" ]; then
+    project_name="${project_path##*/}"
+fi
+
+if [ -n "$project_name" ] && yq -e ".projects.$project_name" "$CONFIG_FILE" > /dev/null 2>&1; then
+    base=".projects.$project_name"
+else
+    base=".default"
+fi
+
+block=$(yq -o=json "$base" "$CONFIG_FILE" 2>/dev/null)
+[ -z "$block" ] || [ "$block" = "null" ] && exit 0
 
 case "$mode" in
     project_dirs)
-        while IFS= read -r line; do
-            line="${line%%#*}"
-            line="${line#"${line%%[![:space:]]*}"}"
-            line="${line%"${line##*[![:space:]]}"}"
-            [[ "$line" != project_dirs* ]] && continue
-            val="${line#*=}"
-            val="${val#"${val%%[![:space:]]*}"}"
-            val="${val#\[}"
-            val="${val%\]}"
-            IFS=',' read -ra items <<< "$val"
-            for item in "${items[@]}"; do
-                item="${item#"${item%%[![:space:]]*}"}"
-                item="${item%"${item##*[![:space:]]}"}"
-                item="${item#\"}"
-                item="${item%\"}"
-                item="${item/#\~/$HOME}"
-                [ -n "$item" ] && echo "$item"
-            done
-        done < "$CONFIG_FILE"
+        yq -r '.project_dirs // [] | .[]' "$CONFIG_FILE" 2>/dev/null | sed "s|^~|$HOME|"
+        exit 0
         ;;
     windows)
-        in_window=false
-        name=""
-        command=""
-        while IFS= read -r line; do
-            line="${line%%#*}"
-            line="${line#"${line%%[![:space:]]*}"}"
-            line="${line%"${line##*[![:space:]]}"}"
-            [ -z "$line" ] && continue
-            if [[ "$line" == "[[windows]]" ]]; then
-                if [ "$in_window" = true ] && [ -n "$name" ]; then
-                    printf '%s\t%s\n' "$name" "$command"
-                fi
-                in_window=true
-                name=""
-                command=""
-                continue
-            fi
-            if [ "$in_window" = true ]; then
-                if [[ "$line" == "["* ]]; then
-                    if [ -n "$name" ]; then
-                        printf '%s\t%s\n' "$name" "$command"
-                    fi
-                    in_window=false
-                    name=""
-                    command=""
-                    continue
-                fi
-                key="${line%%=*}"
-                key="${key%"${key##*[![:space:]]}"}"
-                val="${line#*=}"
-                val="${val#"${val%%[![:space:]]*}"}"
-                val="${val#\"}"
-                val="${val%\"}"
-                case "$key" in
-                    name) name="$val" ;;
-                    command) command="$val" ;;
-                esac
-            fi
-        done < "$CONFIG_FILE"
-        if [ "$in_window" = true ] && [ -n "$name" ]; then
-            printf '%s\t%s\n' "$name" "$command"
-        fi
+        echo "$block" | jq -r '.windows // [] | .[] | "\(.name)\t\(.command // "")"'
+        ;;
+    worktree_dir)
+        echo "$block" | jq -r '.worktree.dir // empty'
+        ;;
+    worktree_symlinks)
+        echo "$block" | jq -r '.worktree.symlinks // [] | .[]'
+        ;;
+    worktree_copies)
+        echo "$block" | jq -r '.worktree.copies // [] | .[]'
+        ;;
+    env)
+        echo "$block" | jq -r '.env // [] | .[]'
+        ;;
+    linear)
+        echo "$block" | jq -r '.linear // {} | to_entries[] | "\(.key)\t\(.value)"'
         ;;
 esac

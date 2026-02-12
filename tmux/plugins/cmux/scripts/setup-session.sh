@@ -35,13 +35,32 @@ setup_session() {
         tmux send-keys -t "$session_name:1" "clear" C-m
     fi
 
-    # Setup windows
-    tmux rename-window -t "$session_name:1" "agent"
-    tmux send-keys -t "$session_name:1" "claude" C-m
-    tmux new-window -t "$session_name" -n "cli" -c "$target_path"
-    tmux new-window -t "$session_name" -n "vim" -c "$target_path"
-    tmux send-keys -t "$session_name:2" "mise trust" C-m
-    tmux select-window -t "$session_name:1"
+    local script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+    local win_idx=1
+
+    while IFS=$'\t' read -r wname wcmd; do
+        [ -z "$wname" ] && continue
+        if [ "$win_idx" -eq 1 ]; then
+            tmux rename-window -t "$session_name:1" "$wname"
+        else
+            tmux new-window -t "$session_name" -n "$wname" -c "$target_path"
+        fi
+        if [ -n "$wcmd" ]; then
+            tmux send-keys -t "$session_name:$win_idx" "$wcmd" C-m
+        fi
+        win_idx=$((win_idx + 1))
+    done < <(bash "$script_dir/parse-config.sh" windows)
+
+    local bot_name=$'\U000f06a9'
+    if [ "$win_idx" -eq 1 ]; then
+        tmux rename-window -t "$session_name:1" "$bot_name"
+    else
+        tmux new-window -t "$session_name" -n "$bot_name" -c "$target_path"
+    fi
+    tmux send-keys -t "$session_name:$win_idx" "claude" C-m
+    local agent_win=$win_idx
+
+    tmux select-window -t "$session_name:$agent_win"
 }
 
 setup_session "$@"

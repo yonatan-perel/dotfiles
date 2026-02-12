@@ -22,8 +22,6 @@ if [ -f "$CLAUDE_STATE_FILE" ] && [ -s "$CLAUDE_STATE_FILE" ]; then
     shopt -s extglob
     NOW=$EPOCHSECONDS
     E=$'\033'
-    BOTS=($'\U000f06a9' $'\U000f169d' $'\U000f169f' $'\U000f16a1' $'\U000f16a3' $'\U000f1719' $'\U000f16a5' $'\U000ee0d')
-    NBOT=${#BOTS[@]}
     while IFS=$'\t' read -r last_changed session_name window_id window_name pane_id pane_title _ _ state; do
         [ -z "$state" ] && continue
         elapsed=$(( NOW - last_changed ))
@@ -35,14 +33,12 @@ if [ -f "$CLAUDE_STATE_FILE" ] && [ -s "$CLAUDE_STATE_FILE" ]; then
         pane="${pane_title##+([^a-zA-Z0-9])}"
         [ ${#pane} -gt 40 ] && pane="${pane:0:37}..."
 
-        pane_num="${pane_id#%}"
-        bot="${BOTS[$(( pane_num % NBOT ))]}"
-        loc="${session_name}:${window_name}"
+        bot="$window_name"
 
         case "$state" in
-            attention) CLAUDE_ENTRIES+="claude|${pane_id}|${window_id}|${session_name}|attention"$'\t'"    ${E}[33m⚠${E}[0m ${bot} ${pane} ${E}[90m[${loc}] ${ago}${E}[0m"$'\n' ;;
-            idle)      CLAUDE_ENTRIES+="claude|${pane_id}|${window_id}|${session_name}|idle"$'\t'"    ${E}[32m✓${E}[0m ${E}[90m${bot} ${pane} [${loc}] ${ago}${E}[0m"$'\n' ;;
-            *)         CLAUDE_ENTRIES+="claude|${pane_id}|${window_id}|${session_name}|running"$'\t'"    ${E}[36m⟳${E}[0m ${bot} ${pane} ${E}[90m[${loc}] ${ago}${E}[0m"$'\n' ;;
+            attention) CLAUDE_ENTRIES+="claude|${pane_id}|${window_id}|${session_name}|attention"$'\t'"    ${E}[33m⚠${E}[0m ${bot} ${pane} ${E}[90m${ago}${E}[0m"$'\n' ;;
+            idle)      CLAUDE_ENTRIES+="claude|${pane_id}|${window_id}|${session_name}|idle"$'\t'"    ${E}[32m✓${E}[0m ${E}[90m${bot} ${pane} ${ago}${E}[0m"$'\n' ;;
+            *)         CLAUDE_ENTRIES+="claude|${pane_id}|${window_id}|${session_name}|running"$'\t'"    ${E}[36m⟳${E}[0m ${bot} ${pane} ${E}[90m${ago}${E}[0m"$'\n' ;;
         esac
     done < "$CLAUDE_STATE_FILE"
 fi
@@ -72,6 +68,10 @@ if [ "$use_cache" = true ]; then
             fi
         elif [ "$type" = "W" ]; then
             all_worktrees+="$field1|$field2"$'\n'
+            if [[ "$repo_list" != *"|$field2|"* ]]; then
+                repo_list+="|$field2|"
+                repos+="$field2"$'\n'
+            fi
         fi
     done < "$WORKTREE_CACHE"
 elif [ "$cached_only" != "--cached" ]; then
@@ -99,6 +99,44 @@ elif [ "$cached_only" != "--cached" ]; then
             fi
         fi
     done < <(tmux list-sessions -F '#{session_name}')
+
+    SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+    _list_repo() {
+        local dir="$1"
+        git -C "$dir" rev-parse --git-dir > /dev/null 2>&1 || return
+        base_repo="$dir"
+        if [ -f "$dir/.git" ]; then
+            common_dir=$(cd "$dir" && git rev-parse --git-common-dir 2>/dev/null)
+            if [ -n "$common_dir" ]; then
+                base_repo=$(cd "$dir" && cd "$common_dir/.." && pwd)
+            fi
+        fi
+        if [[ "$repo_list" != *"|$base_repo|"* ]]; then
+            repo_list+="|$base_repo|"
+            repos+="$base_repo"$'\n'
+            while IFS= read -r line; do
+                if [[ "$line" == "worktree "* ]]; then
+                    all_worktrees+="${line#worktree }|$base_repo"$'\n'
+                fi
+            done < <(git -C "$base_repo" worktree list --porcelain 2>/dev/null)
+        fi
+    }
+
+    while IFS= read -r project_dir; do
+        [ -z "$project_dir" ] && continue
+        if [[ "$project_dir" == *'/*' ]]; then
+            project_dir="${project_dir%/\*}"
+            [ -d "$project_dir" ] || continue
+            for subdir in "$project_dir"/*/; do
+                [ -d "$subdir" ] || continue
+                _list_repo "${subdir%/}"
+            done
+        else
+            [ -d "$project_dir" ] || continue
+            _list_repo "$project_dir"
+        fi
+    done < <(bash "$SCRIPT_DIR/parse-config.sh" project_dirs)
 fi
 
 # --- Output ---

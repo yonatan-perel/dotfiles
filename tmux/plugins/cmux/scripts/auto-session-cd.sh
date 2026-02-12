@@ -53,38 +53,6 @@ _auto_session_cd_setup() {
         fi
         return
     fi
-
-    _auto_session_cd_hook() {
-        local initialized=$(tmux show-environment SESSION_INITIALIZED 2>/dev/null | cut -d= -f2-)
-
-        if [ "$initialized" != "1" ]; then
-            local current_dir="$PWD"
-
-            if git rev-parse --git-dir > /dev/null 2>&1; then
-                local dir_name=$(basename "$current_dir")
-                # Transform session name to replace special characters
-                local session_name=$(echo "$dir_name" | tr './:' '_')
-
-                if [ -n "$session_name" ]; then
-                    tmux rename-session "$session_name"
-                    tmux set-environment SESSION_ROOT_DIR "$current_dir"
-                    tmux set-environment SESSION_INITIALIZED "1"
-
-                    # Use common setup script
-                    local script_path=$(tmux show-environment -g TMUX_AUTO_SESSION_CD_PLUGIN 2>/dev/null | cut -d= -f2-)
-                    if [ -n "$script_path" ]; then
-                        local script_dir="$(dirname "$script_path")"
-                        "$script_dir/setup-session.sh" "$session_name" "$current_dir"
-                    fi
-                fi
-            fi
-        fi
-    }
-
-    if [[ -n "$ZSH_VERSION" ]]; then
-        autoload -Uz add-zsh-hook
-        add-zsh-hook chpwd _auto_session_cd_hook
-    fi
 }
 
 _auto_session_cd_setup

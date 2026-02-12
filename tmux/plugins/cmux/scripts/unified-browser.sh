@@ -93,9 +93,16 @@ while true; do
             printf "\n  Close session '\033[33m%s\033[0m'? (y/n) " "$session"
             read -rsn1 confirm < /dev/tty
             if [ "$confirm" = "y" ]; then
+                if [ "$session" = "$current_session" ]; then
+                    local other=$(tmux list-sessions -F '#S' 2>/dev/null | grep -v "^${session}$" | head -1)
+                    if [ -n "$other" ]; then
+                        tmux switch-client -t "$other"
+                    fi
+                fi
                 bash "$SCRIPT_DIR/worktree-close.sh" "$session" --no-confirm > /dev/null 2>&1
                 bash "$SCRIPT_DIR/cache-worktrees.sh"
                 bash "$SCRIPT_DIR/scan-sessions.sh"
+                current_session=$(tmux display-message -p '#S' 2>/dev/null)
             fi
         fi
         continue

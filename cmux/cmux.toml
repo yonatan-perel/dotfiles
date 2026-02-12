@@ -1,0 +1,9 @@
+project_dirs = ["~/Code/*", "~/.config"]
+
+[[windows]]
+name = "editor"
+#command = "nvim"
+
+[[windows]]
+name = "cli"
+command = "mise trust && clear"

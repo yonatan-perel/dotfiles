@@ -38,7 +38,6 @@ while true; do
         --bind "$ib" \
         --bind "load:pos(2)" \
         --bind "result:transform(echo {} | cut -f1 | grep -q '^header' && echo down)" \
-        --bind "start:reload(bash '$SCRIPT_DIR/unified-list.sh' '$current_session' | tee '$tmp_entries')" \
         --bind "j:down+transform(echo {} | cut -f1 | grep -q '^header' && echo down)" \
         --bind "k:up+transform(echo {} | cut -f1 | grep -q '^header' && { [ {n} -eq 0 ] && echo down || echo up; })" \
         --bind "down:down+transform(echo {} | cut -f1 | grep -q '^header' && echo down)" \
@@ -95,17 +94,21 @@ while true; do
             read -rsn1 confirm < /dev/tty
             if [ "$confirm" = "y" ]; then
                 bash "$SCRIPT_DIR/worktree-close.sh" "$session" --no-confirm > /dev/null 2>&1
+                bash "$SCRIPT_DIR/cache-worktrees.sh"
+                bash "$SCRIPT_DIR/scan-sessions.sh"
             fi
         fi
         continue
     elif [ "$action" = "remove" ]; then
-        if [ "$type" = "worktree" ]; then
+        if [ "$type" = "worktree" ] && [ "$path" != "$base_repo" ]; then
             clear
             printf "\n  Remove worktree '\033[33m%s\033[0m'? (y/n) " "${path##*/}"
             read -rsn1 confirm < /dev/tty
             if [ "$confirm" = "y" ]; then
                 printf "\n\n  \033[90mRemoving...\033[0m"
                 bash "$SCRIPT_DIR/worktree-remove.sh" "$path" "$session" --no-confirm "$base_repo" > /dev/null 2>&1
+                bash "$SCRIPT_DIR/cache-worktrees.sh"
+                bash "$SCRIPT_DIR/scan-sessions.sh"
                 printf "\r  \033[32mRemoved.\033[0m  "
                 sleep 0.5
             fi

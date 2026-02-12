@@ -6,7 +6,7 @@ STATE_FILE="/tmp/claude-agents-state.tsv"
 bash "$SCRIPT_DIR/scan-sessions.sh"
 
 if [ ! -f "$STATE_FILE" ] || [ ! -s "$STATE_FILE" ]; then
-    tmux display-message -d 1500 "${ICON_NONE} No Claude sessions found"
+    tmux display-message -d 2000 "${ICON_NONE} No Claude sessions found"
     exit 0
 fi
 
@@ -19,17 +19,18 @@ while IFS=$'\t' read -r _ sn wid wn pid pt _ _ state; do
 done < "$STATE_FILE"
 
 if [ -z "$PANE_ID" ]; then
-    tmux display-message -d 1500 "${ICON_IDLE} No sessions need attention"
+    tmux display-message -d 2000 "${ICON_IDLE} No sessions need attention"
     exit 0
 fi
 
 if ! tmux list-panes -a -F "#{pane_id}" | grep -q "^${PANE_ID}$"; then
-    tmux display-message -d 1500 "${ICON_ERROR} Pane no longer exists"
+    tmux display-message -d 2000 "${ICON_ERROR} Pane no longer exists"
     exit 1
 fi
 
 tmux switch-client -t "$SESSION_NAME"
 tmux select-window -t "$WINDOW_ID"
 tmux select-pane -t "$PANE_ID"
+BASE=$(cat "/tmp/claude-agents/${PANE_ID}.name" 2>/dev/null)
 CLEAN_TITLE=$(echo "$PANE_TITLE" | sed 's/^[^[:alnum:]]* *//')
-tmux display-message -d 1500 "${ICON_JUMP} ${WINDOW_NAME} ${CLEAN_TITLE}  ${SESSION_NAME}"
+tmux display-message -d 2000 "${ICON_JUMP} ${ICON_ATTENTION} ${BASE} ${CLEAN_TITLE} [${SESSION_NAME}]"

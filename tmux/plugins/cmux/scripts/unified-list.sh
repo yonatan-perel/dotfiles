@@ -15,13 +15,12 @@ done
 
 CLAUDE_STATE_FILE="/tmp/claude-agents-state.tsv"
 WORKTREE_CACHE="/tmp/cmux-worktree-cache"
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # --- Claude entries (from TSV state file maintained every 2s) ---
 CLAUDE_ENTRIES=""
 if [ -f "$CLAUDE_STATE_FILE" ] && [ -s "$CLAUDE_STATE_FILE" ]; then
     shopt -s extglob
-    NOW=$(date +%s)
+    NOW=$EPOCHSECONDS
     E=$'\033'
     BOTS=($'\U000f06a9' $'\U000f169d' $'\U000f169f' $'\U000f16a1' $'\U000f16a3' $'\U000f1719' $'\U000f16a5' $'\U000ee0d')
     NBOT=${#BOTS[@]}
@@ -55,11 +54,11 @@ repo_list=""
 all_worktrees=""
 
 use_cache=false
-if [ -f "$WORKTREE_CACHE" ]; then
-    cache_age=$(( $(date +%s) - $(stat -f %m "$WORKTREE_CACHE" 2>/dev/null || echo 0) ))
-    if [ "$cache_age" -lt 10 ] || [ "$cached_only" = "--cached" ]; then
-        use_cache=true
-    fi
+if [ "$cached_only" = "--cached" ]; then
+    [ -f "$WORKTREE_CACHE" ] && use_cache=true
+elif [ -f "$WORKTREE_CACHE" ]; then
+    cache_age=$(( EPOCHSECONDS - $(stat -f %m "$WORKTREE_CACHE" 2>/dev/null || echo 0) ))
+    [ "$cache_age" -lt 10 ] && use_cache=true
 fi
 
 if [ "$use_cache" = true ]; then
@@ -118,14 +117,16 @@ get_claude_instances() {
     local ctx_repo="$2"
     local ctx_wt="$3"
     [ -z "$CLAUDE_ENTRIES" ] && return
-    printf '%s\n' "$CLAUDE_ENTRIES" | grep -F "|${session_name}|" | while IFS= read -r line; do
+    local line
+    while IFS= read -r line; do
         [ -z "$line" ] && continue
+        [[ "$line" != *"|${session_name}|"* ]] && continue
         if [ -n "$ctx_repo" ]; then
             printf '%s \033[34m· %s\033[0m/\033[33m%s\033[0m\n' "$line" "$ctx_repo" "$ctx_wt"
         else
             printf '%s\n' "$line"
         fi
-    done
+    done <<< "$CLAUDE_ENTRIES"
 }
 
 output_repo() {

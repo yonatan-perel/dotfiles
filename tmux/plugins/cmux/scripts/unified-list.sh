@@ -35,7 +35,8 @@ if [ -f "$CLAUDE_STATE_FILE" ] && [ -s "$CLAUDE_STATE_FILE" ]; then
         pane="${pane_title##+([^a-zA-Z0-9])}"
         [ ${#pane} -gt 40 ] && pane="${pane:0:37}..."
 
-        bot="$window_name"
+        bot=$(cat "/tmp/claude-agents/${pane_id}.name" 2>/dev/null)
+        [ -z "$bot" ] && bot="$window_name"
 
         case "$state" in
             attention) CLAUDE_ENTRIES+="claude|${pane_id}|${window_id}|${session_name}|attention"$'\t'"    ${E}[33m${ICON_ATTENTION}${E}[0m ${bot} ${pane} ${E}[90m${ago}${E}[0m"$'\n' ;;

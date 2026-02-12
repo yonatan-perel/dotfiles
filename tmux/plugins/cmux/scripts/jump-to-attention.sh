@@ -21,7 +21,7 @@ while IFS=$'\t' read -r _ sn wid wn pid pt _ _ state; do
 done < "$STATE_FILE"
 
 if [ -z "$PANE_ID" ]; then
-    tmux display-message -d 2000 "${ICON_IDLE} No sessions need attention"
+    tmux display-message -d 2000 "${ICON_IDLE} No other bots need attention"
     exit 0
 fi
 

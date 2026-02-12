@@ -57,6 +57,16 @@
         ]
       }
     ],
+    "PreToolUse": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash ~/.config/tmux/plugins/cmux/scripts/update-state.sh running"
+          }
+        ]
+      }
+    ],
     "PostToolUse": [
       {
         "hooks": [

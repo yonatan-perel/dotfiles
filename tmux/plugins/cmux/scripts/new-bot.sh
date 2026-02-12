@@ -19,4 +19,5 @@ if [ -z "$name" ]; then
 fi
 
 tmux new-window -t "$session" -n "$name" ${target_path:+-c "$target_path"}
+tmux set-option -w -t "$session:$name" @is_bot 1
 tmux send-keys -t "$session:$name" "claude" C-m

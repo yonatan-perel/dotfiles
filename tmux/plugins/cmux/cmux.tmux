@@ -36,5 +36,10 @@ fi
 # Set status interval for updates (every 2 seconds)
 tmux set-option -g status-interval 2
 
+# Guard split/rename in bot windows
+tmux bind-key \\ if-shell '[ "$(tmux show-window-option -v @is_bot 2>/dev/null)" = 1 ]' '' 'split-window -h'
+tmux bind-key - if-shell '[ "$(tmux show-window-option -v @is_bot 2>/dev/null)" = 1 ]' '' 'split-window -v'
+tmux bind-key , if-shell '[ "$(tmux show-window-option -v @is_bot 2>/dev/null)" = 1 ]' '' 'command-prompt -I "#W" "rename-window -- \"%%\""'
+
 # Auto-create default project session on startup
 bash "$CURRENT_DIR/scripts/startup.sh" &

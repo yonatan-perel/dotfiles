@@ -35,3 +35,6 @@ fi
 
 # Set status interval for updates (every 2 seconds)
 tmux set-option -g status-interval 2
+
+# Auto-create default project session on startup
+bash "$CURRENT_DIR/scripts/startup.sh" &

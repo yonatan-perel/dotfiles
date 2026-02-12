@@ -1,4 +1,6 @@
 #!/bin/bash
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+source "$SCRIPT_DIR/icons.sh"
 STATE_FILE="/tmp/claude-agents-state.tsv"
 
 if [ ! -f "$STATE_FILE" ] || [ ! -s "$STATE_FILE" ]; then
@@ -18,9 +20,9 @@ done < "$STATE_FILE"
 
 format_counts() {
     local attn="$1" idle="$2" running="$3" result=""
-    [ "$attn" -gt 0 ] && result+="#[fg=yellow,bold]⚠${attn}#[default]"
-    [ "$idle" -gt 0 ] && { [ -n "$result" ] && result+=" "; result+="#[fg=green]✓${idle}#[default]"; }
-    [ "$running" -gt 0 ] && { [ -n "$result" ] && result+=" "; result+="#[fg=blue]⟳${running}#[default]"; }
+    [ "$attn" -gt 0 ] && result+="#[fg=yellow,bold]${ICON_ATTENTION} ${attn}#[default]"
+    [ "$idle" -gt 0 ] && { [ -n "$result" ] && result+=" "; result+="#[fg=green]${ICON_IDLE} ${idle}#[default]"; }
+    [ "$running" -gt 0 ] && { [ -n "$result" ] && result+=" "; result+="#[fg=blue]${ICON_RUNNING} ${running}#[default]"; }
     printf '%s' "$result"
 }
 
@@ -40,5 +42,5 @@ fi
 if [ -n "$OUTPUT" ]; then
     TOTAL=$((ATTENTION + IDLE + RUNNING))
     ICON=$'\xf3\xb1\x9a\x9f'
-    echo "${TOTAL}_${ICON}  ${OUTPUT}"
+    echo "${TOTAL}_${ICON}   ${OUTPUT}"
 fi

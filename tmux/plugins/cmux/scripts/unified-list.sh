@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+source "$SCRIPT_DIR/icons.sh"
 
 current_session="$1"
 if [ -z "$current_session" ]; then
@@ -36,9 +38,9 @@ if [ -f "$CLAUDE_STATE_FILE" ] && [ -s "$CLAUDE_STATE_FILE" ]; then
         bot="$window_name"
 
         case "$state" in
-            attention) CLAUDE_ENTRIES+="claude|${pane_id}|${window_id}|${session_name}|attention"$'\t'"    ${E}[33m⚠${E}[0m ${bot} ${pane} ${E}[90m${ago}${E}[0m"$'\n' ;;
-            idle)      CLAUDE_ENTRIES+="claude|${pane_id}|${window_id}|${session_name}|idle"$'\t'"    ${E}[32m✓${E}[0m ${E}[90m${bot} ${pane} ${ago}${E}[0m"$'\n' ;;
-            *)         CLAUDE_ENTRIES+="claude|${pane_id}|${window_id}|${session_name}|running"$'\t'"    ${E}[36m⟳${E}[0m ${bot} ${pane} ${E}[90m${ago}${E}[0m"$'\n' ;;
+            attention) CLAUDE_ENTRIES+="claude|${pane_id}|${window_id}|${session_name}|attention"$'\t'"    ${E}[33m${ICON_ATTENTION}${E}[0m ${bot} ${pane} ${E}[90m${ago}${E}[0m"$'\n' ;;
+            idle)      CLAUDE_ENTRIES+="claude|${pane_id}|${window_id}|${session_name}|idle"$'\t'"    ${E}[32m${ICON_IDLE}${E}[0m ${E}[90m${bot} ${pane} ${ago}${E}[0m"$'\n' ;;
+            *)         CLAUDE_ENTRIES+="claude|${pane_id}|${window_id}|${session_name}|running"$'\t'"    ${E}[36m${ICON_RUNNING}${E}[0m ${bot} ${pane} ${E}[90m${ago}${E}[0m"$'\n' ;;
         esac
     done < "$CLAUDE_STATE_FILE"
 fi

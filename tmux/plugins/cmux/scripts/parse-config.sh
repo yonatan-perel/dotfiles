@@ -24,6 +24,14 @@ block=$(yq -o=json "$base" "$CONFIG_FILE" 2>/dev/null)
 [ -z "$block" ] || [ "$block" = "null" ] && exit 0
 
 case "$mode" in
+    default_project)
+        dp=$(yq -r '.projects | to_entries[] | select(.value.default == true) | .key' "$CONFIG_FILE" 2>/dev/null | head -1)
+        if [ -z "$dp" ]; then
+            dp=$(yq -r '.projects | keys | .[0]' "$CONFIG_FILE" 2>/dev/null)
+        fi
+        [ -n "$dp" ] && [ "$dp" != "null" ] && echo "$dp"
+        exit 0
+        ;;
     project_dirs)
         yq -r '.project_dirs // [] | .[]' "$CONFIG_FILE" 2>/dev/null | sed "s|^~|$HOME|"
         exit 0

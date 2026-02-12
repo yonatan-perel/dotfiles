@@ -10,6 +10,7 @@ default:
 
 projects:
   pointfive:
+    default: true
     env:
       - .env
       - .env.me

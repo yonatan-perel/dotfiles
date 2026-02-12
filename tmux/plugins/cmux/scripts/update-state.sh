@@ -54,7 +54,10 @@ set_attention() {
     if ! terminal_is_focused "$frontmost"; then
         notify_macos "🤖 ${pane_title}" "[${session_name}] needs attention" "cmux-${PANE_ID}"
     fi
-    tmux display-message -d 2000 "${ICON_INCOMING} ${ICON_ATTENTION} ${base} ${pane_title} [${session_name}]" &
+    local pane_focused=$(tmux list-panes -a -F '#{pane_active}#{window_active}#{session_attached} #{pane_id}' 2>/dev/null | grep -q "^111 ${PANE_ID}$" && echo 1)
+    if [ "$pane_focused" != "1" ]; then
+        tmux display-message -d 2000 "${ICON_INCOMING} ${ICON_ATTENTION} ${base} ${pane_title} [${session_name}]" &
+    fi
     tmux refresh-client -S &
 }
 

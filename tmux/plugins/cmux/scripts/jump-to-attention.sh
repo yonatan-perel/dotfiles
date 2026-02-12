@@ -10,9 +10,11 @@ if [ ! -f "$STATE_FILE" ] || [ ! -s "$STATE_FILE" ]; then
     exit 0
 fi
 
+CURRENT_PANE=$(tmux display-message -p '#{pane_id}')
+
 SESSION_NAME="" WINDOW_ID="" PANE_ID="" WINDOW_NAME="" PANE_TITLE=""
 while IFS=$'\t' read -r _ sn wid wn pid pt _ _ state; do
-    if [ "$state" = "attention" ]; then
+    if [ "$state" = "attention" ] && [ "$pid" != "$CURRENT_PANE" ]; then
         SESSION_NAME="$sn" WINDOW_ID="$wid" WINDOW_NAME="$wn" PANE_ID="$pid" PANE_TITLE="$pt"
         break
     fi

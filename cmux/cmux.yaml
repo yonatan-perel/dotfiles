@@ -6,7 +6,6 @@ default:
   windows:
     - name: editor
     - name: cli
-      command: "mise trust && clear"
 
 projects:
   pointfive:
@@ -17,7 +16,10 @@ projects:
     windows:
       - name: editor
       - name: cli
-        command: "mise trust && clear"
+        commands: 
+          - mise trust  
+          - cd dbt && dbt deps && cd ..
+          - clear
     worktree:
       dir: "../worktrees"
       symlinks:

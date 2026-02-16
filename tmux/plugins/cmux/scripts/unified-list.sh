@@ -20,6 +20,7 @@ WORKTREE_CACHE="/tmp/cmux-worktree-cache"
 
 # --- Claude entries (from TSV state file maintained every 2s) ---
 CLAUDE_ENTRIES=""
+declare -A session_priority
 if [ -f "$CLAUDE_STATE_FILE" ] && [ -s "$CLAUDE_STATE_FILE" ]; then
     shopt -s extglob
     NOW=$EPOCHSECONDS
@@ -38,11 +39,14 @@ if [ -f "$CLAUDE_STATE_FILE" ] && [ -s "$CLAUDE_STATE_FILE" ]; then
         bot=$(cat "/tmp/claude-agents/${pane_id}.name" 2>/dev/null)
         [ -z "$bot" ] && bot="$window_name"
 
+        local_pri=3
         case "$state" in
-            attention) CLAUDE_ENTRIES+="claude|${pane_id}|${window_id}|${session_name}|attention"$'\t'"    ${E}[33m${ICON_ATTENTION}${E}[0m ${bot} ${pane} ${E}[90m${ago}${E}[0m"$'\n' ;;
-            idle)      CLAUDE_ENTRIES+="claude|${pane_id}|${window_id}|${session_name}|idle"$'\t'"    ${E}[32m${ICON_IDLE}${E}[0m ${E}[90m${bot} ${pane} ${ago}${E}[0m"$'\n' ;;
-            *)         CLAUDE_ENTRIES+="claude|${pane_id}|${window_id}|${session_name}|running"$'\t'"    ${E}[36m${ICON_RUNNING}${E}[0m ${bot} ${pane} ${E}[90m${ago}${E}[0m"$'\n' ;;
+            attention) CLAUDE_ENTRIES+="claude|${pane_id}|${window_id}|${session_name}|attention"$'\t'"    ${E}[33m${ICON_ATTENTION}${E}[0m ${bot} ${pane} ${E}[90m${ago}${E}[0m"$'\n'; local_pri=0 ;;
+            idle)      CLAUDE_ENTRIES+="claude|${pane_id}|${window_id}|${session_name}|idle"$'\t'"    ${E}[32m${ICON_IDLE}${E}[0m ${E}[90m${bot} ${pane} ${ago}${E}[0m"$'\n'; local_pri=2 ;;
+            *)         CLAUDE_ENTRIES+="claude|${pane_id}|${window_id}|${session_name}|running"$'\t'"    ${E}[36m${ICON_RUNNING}${E}[0m ${bot} ${pane} ${E}[90m${ago}${E}[0m"$'\n'; local_pri=1 ;;
         esac
+        cur_pri="${session_priority[$session_name]:-3}"
+        [ "$local_pri" -lt "$cur_pri" ] && session_priority[$session_name]="$local_pri"
     done < "$CLAUDE_STATE_FILE"
 fi
 
@@ -194,10 +198,18 @@ output_repo() {
         done <<< "$sessions"
     fi
 
+    local sorted_sessions=""
     while IFS='|' read -r sess root base; do
         [ -z "$sess" ] && continue
         [ "$sess" = "$current_session" ] && continue
         [ "$base" != "$repo" ] && continue
+        local pri="${session_priority[$sess]:-3}"
+        sorted_sessions+="${pri}|${sess}|${root}|${base}"$'\n'
+    done <<< "$sessions"
+    sorted_sessions=$(printf '%s' "$sorted_sessions" | sort -t'|' -k1,1n)
+
+    while IFS='|' read -r _ sess root base; do
+        [ -z "$sess" ] && continue
         local wt_name="${root##*/}"
         [ "$root" = "$repo" ] && wt_name="main"
         if [ "$search_mode" = "true" ]; then
@@ -207,7 +219,7 @@ output_repo() {
             printf 'worktree|%s|%s|active|%s\t  \033[32m●\033[0m %s (\033[33m%s\033[0m)\n' "$root" "$sess" "$repo" "$wt_name" "$sess"
             get_claude_instances "$sess"
         fi
-    done <<< "$sessions"
+    done <<< "$sorted_sessions"
 
     while IFS='|' read -r wt_path wt_repo; do
         [ -z "$wt_path" ] && continue
@@ -227,8 +239,25 @@ if [ -n "$current_repo" ]; then
     output_repo "$current_repo"
 fi
 
+declare -A repo_priority
+while IFS='|' read -r sess root base; do
+    [ -z "$sess" ] && continue
+    [ "$base" = "$current_repo" ] && continue
+    sp="${session_priority[$sess]:-3}"
+    rp="${repo_priority[$base]:-3}"
+    [ "$sp" -lt "$rp" ] && repo_priority[$base]="$sp"
+done <<< "$sessions"
+
+sorted_repos=""
 while IFS= read -r repo; do
     [ -z "$repo" ] && continue
     [ "$repo" = "$current_repo" ] && continue
-    output_repo "$repo"
+    rp="${repo_priority[$repo]:-3}"
+    sorted_repos+="${rp}|${repo}"$'\n'
 done <<< "$repos"
+sorted_repos=$(printf '%s' "$sorted_repos" | sort -t'|' -k1,1n)
+
+while IFS='|' read -r _ repo; do
+    [ -z "$repo" ] && continue
+    output_repo "$repo"
+done <<< "$sorted_repos"

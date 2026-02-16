@@ -7,14 +7,16 @@ target_path=$(tmux show-environment -t "$session" SESSION_ROOT_DIR 2>/dev/null |
 
 used=$(tmux list-windows -t "$session" -F '#W' 2>/dev/null)
 
+available=()
 for bot in "${BOTS[@]}"; do
-    if ! echo "$used" | grep -qxF "$bot"; then
-        name="$bot"
-        break
+    if ! echo "$used" | grep -qF "$bot"; then
+        available+=("$bot")
     fi
 done
 
-if [ -z "$name" ]; then
+if [ ${#available[@]} -gt 0 ]; then
+    name="${available[$((RANDOM % ${#available[@]}))]}"
+else
     name="${BOTS[$((RANDOM % ${#BOTS[@]}))]}"
 fi
 

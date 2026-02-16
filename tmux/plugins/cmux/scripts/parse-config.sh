@@ -37,7 +37,10 @@ case "$mode" in
         exit 0
         ;;
     windows)
-        echo "$block" | jq -r '.windows // [] | .[] | "\(.name)\t\(.command // "")"'
+        echo "$block" | jq -r '.windows // [] | .[] | .name'
+        ;;
+    window_commands)
+        echo "$block" | jq -r '.windows // [] | .[] | if .commands then (.commands | join("\n")) elif .command then .command else "" end, "---"'
         ;;
     worktree_dir)
         echo "$block" | jq -r '.worktree.dir // empty'

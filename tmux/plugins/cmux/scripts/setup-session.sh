@@ -41,9 +41,11 @@ setup_session() {
         fi
     }
 
+    # Phase 1: Create all reserved windows (no commands yet)
     local win_idx=1
+    local -a window_indices=()
 
-    while IFS=$'\t' read -r wname wcmd; do
+    while IFS= read -r wname; do
         [ -z "$wname" ] && continue
         if [ "$win_idx" -eq 1 ]; then
             tmux rename-window -t "$session_name:1" "$wname"
@@ -51,12 +53,11 @@ setup_session() {
             tmux new-window -t "$session_name" -n "$wname" -c "$target_path"
         fi
         source_env_in_window "$session_name:$win_idx"
-        if [ -n "$wcmd" ]; then
-            tmux send-keys -t "$session_name:$win_idx" "$wcmd" C-m
-        fi
+        window_indices+=("$win_idx")
         win_idx=$((win_idx + 1))
     done < <(bash "$script_dir/parse-config.sh" windows "$main_repo_dir")
 
+    # Phase 2: Create and start agent window
     local bot_name=$'\U000f06a9'
     if [ "$win_idx" -eq 1 ]; then
         tmux rename-window -t "$session_name:1" "$bot_name"
@@ -66,9 +67,20 @@ setup_session() {
     tmux set-option -w -t "$session_name:$win_idx" @is_bot 1
     source_env_in_window "$session_name:$win_idx"
     tmux send-keys -t "$session_name:$win_idx" "claude" C-m
-    local agent_win=$win_idx
+    tmux select-window -t "$session_name:$win_idx"
 
-    tmux select-window -t "$session_name:$agent_win"
+    # Phase 3: Run commands on reserved windows
+    local widx_pos=0
+    local widx=""
+    while IFS= read -r line; do
+        if [ "$line" = "---" ]; then
+            widx_pos=$((widx_pos + 1))
+            continue
+        fi
+        [ -z "$line" ] && continue
+        widx="${window_indices[$widx_pos]}"
+        tmux send-keys -t "$session_name:$widx" "$line" C-m
+    done < <(bash "$script_dir/parse-config.sh" window_commands "$main_repo_dir")
 }
 
 setup_session "$@"

@@ -74,7 +74,7 @@ if [ "$HOOK_TYPE" = "dismiss" ]; then
             dismiss_notification "cmux-${PANE_ID}"
             update_window_name "$PANE_ID" "idle"
             tmux display-message -d 2000 "${ICON_IDLE} ${BASE} ${PANE_TITLE} [${SESSION_NAME}]"
-        else
+        elif [ "$CURRENT" = "idle" ]; then
             echo "attention" > "$STATE_FILE"
             update_window_name "$PANE_ID" "attention"
             tmux display-message -d 2000 "${ICON_ATTENTION} ${BASE} ${PANE_TITLE} [${SESSION_NAME}]"
